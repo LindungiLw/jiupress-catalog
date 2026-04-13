@@ -1,197 +1,169 @@
-"use client"; // Wajib di Next.js karena kita pakai state (useState)
+"use client";
 
-import React, { useState } from "react";
-import { User, Menu, X, Globe } from "lucide-react"; // Search dihapus dari import
+import React, { useState, useEffect } from "react";
+import { Search, BookOpen, Users, Tags, Globe, UserCircle } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const Navbar = () => {
-  // State untuk mengontrol menu HP (terbuka/tertutup)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+  const [isScrolled, setIsScrolled] = useState(false);
 
-  // Fungsi toggle menu
-  const toggleMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+  // Efek untuk mendeteksi apakah layar sedang di-scroll
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   return (
-    <nav style={styles.navContainer}>
-      {/* 1. KIRI: LOGO */}
-      <div style={styles.logo}>
-        <Link href="/" style={{ color: "#FFFFFF", textDecoration: "none" }}>
-          JIU Library
+    <>
+      {/* ─── 1. TOP HEADER (Tetap Diam di Atas + Efek Kaca) ─── */}
+      <header
+        className={`fixed top-0 left-0 z-50 w-full px-6 transition-all duration-300 flex items-center justify-between ${
+          isScrolled
+            ? "py-3 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100"
+            : "py-5 bg-transparent"
+        }`}
+      >
+        {/* Kiri: Logo */}
+        <Link
+          href="/"
+          className="flex items-center gap-2 group active:scale-95 transition-transform"
+        >
+          <div className="bg-[#1e2d6b] text-white font-black text-xl px-4 py-1 rounded-full rounded-tr-none transition-transform group-hover:scale-105 shadow-sm">
+            JIU
+          </div>
+          <span className="font-bold text-xl text-[#1e2d6b] tracking-tight">
+            Library
+          </span>
         </Link>
-      </div>
 
-      {/* 2. TENGAH: MENU DESKTOP */}
-      <ul style={styles.desktopMenu}>
-        <li>
-          <Link href="/" style={styles.link}>
-            Beranda
-          </Link>
-        </li>
-        <li>
-          <Link href="/layanan" style={styles.link}>
-            Layanan
-          </Link>
-        </li>
-        <li>
-          <Link href="/tentang" style={styles.link}>
-            Tentang Kami
-          </Link>
-        </li>
-      </ul>
+        {/* Kanan: Link Tambahan & Profil */}
+        <div className="flex items-center gap-6">
+          {/* Link Desktop */}
+          <div className="hidden md:flex items-center gap-8 text-sm font-bold text-[#1e2d6b]/70">
+            <Link
+              href="/layanan"
+              className="hover:text-[#FFD32B] hover:-translate-y-0.5 transition-all"
+            >
+              Layanan
+            </Link>
+            <Link
+              href="/tentang"
+              className="hover:text-[#FFD32B] hover:-translate-y-0.5 transition-all"
+            >
+              Tentang Kami
+            </Link>
+            <Link
+              href="/bantuan"
+              className="hover:text-[#FFD32B] hover:-translate-y-0.5 transition-all"
+            >
+              Bantuan?
+            </Link>
+          </div>
 
-      {/* 3. KANAN: ACTIONS (Tanpa Tombol Search) */}
-      <div style={styles.desktopActions}>
-        {/* Tombol Pengaturan Bahasa */}
-        <button style={styles.iconButton} aria-label="Ganti Bahasa">
-          <Globe size={22} color="#FFFFFF" />
-          <span
-            style={{
-              color: "#FFFFFF",
-              marginLeft: "4px",
-              fontSize: "0.9rem",
-              fontWeight: "500",
-            }}
+          {/* Ganti Bahasa */}
+          <button className="hidden md:flex items-center gap-1.5 text-[#1e2d6b]/70 hover:text-[#1e2d6b] hover:scale-105 active:scale-95 transition-all">
+            <Globe size={18} />
+            <span className="text-sm font-bold">ID</span>
+          </button>
+
+          {/* Tombol Login */}
+          <Link
+            href="/login"
+            className="flex items-center gap-2 text-[#1e2d6b] hover:text-[#FFD32B] hover:scale-110 active:scale-90 transition-all"
           >
-            ID
+            <UserCircle size={32} strokeWidth={1.5} />
+          </Link>
+        </div>
+      </header>
+
+      {/* ─── 2. BOTTOM NAVIGATION BAR (Bawah: Menu & Search) ─── */}
+      <nav className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-100 shadow-[0_-8px_30px_rgba(0,0,0,0.06)] z-50 px-6 py-3 flex items-center justify-between md:justify-center md:gap-20 pb-safe">
+        {/* Tombol Search */}
+        <button
+          onClick={() => {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            setTimeout(
+              () => document.getElementById("search-input")?.focus(),
+              500,
+            );
+          }}
+          className="flex flex-col md:flex-row items-center gap-1 md:gap-2 text-gray-400 hover:text-[#1e2d6b] hover:-translate-y-1 active:scale-90 transition-all group"
+        >
+          <Search
+            size={22}
+            className="group-hover:stroke-[2.5px] transition-all"
+          />
+          <span className="text-[10px] md:text-sm font-bold uppercase md:capitalize tracking-wider md:tracking-normal">
+            Search
           </span>
         </button>
 
-        {/* Tombol Login Admin */}
-        <button style={styles.iconButton} aria-label="Login Admin">
-          <User size={22} color="#FFFFFF" />
-        </button>
-      </div>
+        {/* Menu Utama: Books */}
+        <Link
+          href="/"
+          className={`flex flex-col md:flex-row items-center gap-1 md:gap-2 hover:-translate-y-1 active:scale-90 transition-all ${
+            pathname === "/"
+              ? "text-[#1e2d6b]"
+              : "text-gray-400 hover:text-[#1e2d6b]"
+          }`}
+        >
+          <BookOpen
+            size={22}
+            className={pathname === "/" ? "stroke-[2.5px]" : ""}
+          />
+          <span className="text-[10px] md:text-sm font-bold uppercase md:capitalize tracking-wider md:tracking-normal">
+            Books
+          </span>
+        </Link>
 
-      {/* 4. TOMBOL HAMBURGER (Tampil di HP) */}
-      <button style={styles.mobileMenuButton} onClick={toggleMenu}>
-        {isMobileMenuOpen ? (
-          <X size={28} color="#FFFFFF" />
-        ) : (
-          <Menu size={28} color="#FFFFFF" />
-        )}
-      </button>
+        {/* Menu Utama: Authors */}
+        <Link
+          href="/penulis"
+          className={`flex flex-col md:flex-row items-center gap-1 md:gap-2 hover:-translate-y-1 active:scale-90 transition-all ${
+            pathname === "/penulis"
+              ? "text-[#1e2d6b]"
+              : "text-gray-400 hover:text-[#1e2d6b]"
+          }`}
+        >
+          <Users
+            size={22}
+            className={pathname === "/penulis" ? "stroke-[2.5px]" : ""}
+          />
+          <span className="text-[10px] md:text-sm font-bold uppercase md:capitalize tracking-wider md:tracking-normal">
+            Authors
+          </span>
+        </Link>
 
-      {/* 5. DROPDOWN MENU MOBILE */}
-      {isMobileMenuOpen && (
-        <div style={styles.mobileDropdown}>
-          <Link href="/" style={styles.mobileLink} onClick={toggleMenu}>
-            Beranda
-          </Link>
-          <Link href="/layanan" style={styles.mobileLink} onClick={toggleMenu}>
-            Layanan
-          </Link>
-          <Link href="/tentang" style={styles.mobileLink} onClick={toggleMenu}>
-            Tentang Kami
-          </Link>
-
-          <div style={styles.mobileActions}>
-            <button
-              style={{
-                ...styles.iconButton,
-                color: "#FFFFFF",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <Globe size={20} color="#FFFFFF" /> Bahasa (ID)
-            </button>
-            <button
-              style={{
-                ...styles.iconButton,
-                color: "#FFFFFF",
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-              }}
-            >
-              <User size={20} color="#FFFFFF" /> Login Admin
-            </button>
-          </div>
-        </div>
-      )}
-    </nav>
+        {/* Menu Utama: Genres */}
+        <Link
+          href="/kategori"
+          className={`flex flex-col md:flex-row items-center gap-1 md:gap-2 hover:-translate-y-1 active:scale-90 transition-all ${
+            pathname === "/kategori"
+              ? "text-[#1e2d6b]"
+              : "text-gray-400 hover:text-[#1e2d6b]"
+          }`}
+        >
+          <Tags
+            size={22}
+            className={pathname === "/kategori" ? "stroke-[2.5px]" : ""}
+          />
+          <span className="text-[10px] md:text-sm font-bold uppercase md:capitalize tracking-wider md:tracking-normal">
+            Genres
+          </span>
+        </Link>
+      </nav>
+    </>
   );
-};
-
-// CSS-in-JS dengan tipe data React.CSSProperties
-const styles: { [key: string]: React.CSSProperties } = {
-  navContainer: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#273374", // Primary JIU Navy
-    padding: "1rem 5%",
-    fontFamily: "Poppins, sans-serif",
-    position: "relative",
-    boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-    zIndex: 1000,
-  },
-  logo: {
-    fontSize: "1.5rem",
-    fontWeight: "bold",
-    color: "#FFFFFF",
-  },
-  desktopMenu: {
-    display: "flex",
-    gap: "2.5rem",
-    listStyle: "none",
-    margin: 0,
-    padding: 0,
-    fontFamily: "Pretendard, sans-serif",
-  },
-  link: {
-    color: "#FFFFFF",
-    textDecoration: "none",
-    fontSize: "1rem",
-    fontWeight: "500",
-    transition: "color 0.3s ease",
-  },
-  desktopActions: {
-    display: "flex",
-    alignItems: "center",
-    gap: "1.5rem",
-  },
-  iconButton: {
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-    display: "flex",
-    alignItems: "center",
-    padding: "0.5rem",
-  },
-  mobileMenuButton: {
-    display: "none", // Munculkan lewat media query CSS nanti
-    background: "none",
-    border: "none",
-    cursor: "pointer",
-  },
-  mobileDropdown: {
-    position: "absolute",
-    top: "100%",
-    left: 0,
-    right: 0,
-    backgroundColor: "#273374",
-    display: "flex",
-    flexDirection: "column",
-    padding: "1rem 5%",
-    borderTop: "1px solid rgba(255,255,255,0.1)",
-  },
-  mobileLink: {
-    color: "#FFFFFF",
-    textDecoration: "none",
-    padding: "1rem 0",
-    borderBottom: "1px solid rgba(255,255,255,0.05)",
-    fontFamily: "Pretendard, sans-serif",
-  },
-  mobileActions: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1rem",
-    paddingTop: "1rem",
-  },
 };
 
 export default Navbar;

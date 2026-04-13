@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-import Navbar from "../components/Navbar";
+// 1. UBAH IMPORT-NYA MENJADI INI:
+import ConditionalNavbar from "../components/ConditionalNavbar";
 
-// Kita pakai font Poppins biar sesuai desain UI modern-nya
 const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
@@ -22,8 +22,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.className} bg-[#F8FAFC] antialiased`}>
-        {/* Navbar akan selalu ada di atas */}
-        <Navbar />
+        {/* 2. PAKAI NAVBAR PINTAR DI SINI */}
+        <ConditionalNavbar />
 
         {/* Ini adalah isi halamannya (Home, dsb) yang akan berubah-ubah */}
         {children}

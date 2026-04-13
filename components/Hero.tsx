@@ -214,30 +214,38 @@ const Hero: React.FC = () => {
 
   // ── Render ─────────────────────────────────────────────────────────────
   return (
-    <section className="relative min-h-[520px] w-full flex flex-col items-center justify-center overflow-hidden bg-[#f7f8fc] px-6 pb-16 pt-12 font-[Plus_Jakarta_Sans,sans-serif]">
+    <section
+      id="hero-search"
+      className="relative min-h-[560px] w-full flex flex-col items-center justify-center overflow-hidden bg-[#f8fafc] px-6 pb-28 pt-20 font-[Plus_Jakarta_Sans,sans-serif]"
+    >
+      {/* ── BACKGROUND MODERN BLOBS (Biar terasa lebih hidup) ── */}
+      <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-blue-400/10 blur-[80px] pointer-events-none"></div>
+      <div className="absolute bottom-[10%] right-[-5%] w-[400px] h-[400px] rounded-full bg-[#FFD32B]/15 blur-[80px] pointer-events-none"></div>
+
       {/* Radial hero glow */}
       <div
-        className="pointer-events-none absolute inset-0"
+        className="pointer-events-none absolute inset-0 z-0"
         style={{
           background:
             "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(30,45,107,0.06) 0%, transparent 70%)",
         }}
       />
 
-      {/* ── Headline ── */}
-      <div className="relative z-10 mb-10 text-center">
+      {/* ── Headline (Font dikecilkan jadi maks 56px) ── */}
+      <div className="relative z-10 mb-8 text-center mt-8">
         <h1
-          className="mb-3 text-[clamp(36px,7vw,68px)] font-black leading-[1.05] tracking-tight text-[#1e2d6b]"
+          className="mb-3 text-[clamp(32px,5vw,56px)] font-black leading-[1.1] tracking-tight text-[#1e2d6b]"
           style={{ fontFamily: "Poppins, sans-serif" }}
         >
           Cari Ilmu.{" "}
           <span className="relative inline-block text-[#e6b800]">
             Cepat.
-            <span className="absolute bottom-0.5 left-0 right-0 h-1 rounded bg-[#FFD32B] scale-x-[0.85] origin-left" />
+            <span className="absolute bottom-1 left-0 right-0 h-1.5 rounded bg-[#FFD32B] scale-x-[0.85] origin-left" />
           </span>
         </h1>
-        <p className="mx-auto max-w-sm text-[clamp(14px,2vw,17px)] font-medium leading-relaxed text-[#1e2d6b]/60">
-          Akses ribuan koleksi JIU University dalam satu tempat.
+        <p className="mx-auto max-w-md text-[clamp(14px,1.5vw,16px)] font-medium leading-relaxed text-[#1e2d6b]/60">
+          Akses ribuan koleksi perpustakaan JIU University dalam satu tempat
+          dengan mudah.
         </p>
       </div>
 
@@ -468,6 +476,7 @@ const Hero: React.FC = () => {
             <Search size={22} strokeWidth={2.2} />
           </span>
           <input
+            id="search-input"
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -484,7 +493,7 @@ const Hero: React.FC = () => {
         </form>
 
         {/* ── Hint chips ── */}
-        <div className="mt-3.5 flex flex-wrap justify-center gap-2">
+        <div className="mt-4 flex flex-wrap justify-center gap-2">
           {[
             "Basis Data",
             "Kecerdasan Buatan",
@@ -495,24 +504,24 @@ const Hero: React.FC = () => {
               key={chip}
               type="button"
               onClick={() => setQuery(chip)}
-              className="rounded-full bg-[#1e2d6b]/[0.06] px-3.5 py-1.5 text-xs font-semibold text-[#1e2d6b]/55 transition-all hover:bg-[#1e2d6b]/[0.13] hover:text-[#1e2d6b]"
+              className="rounded-full bg-white/60 border border-[#1e2d6b]/5 px-4 py-1.5 text-[13px] font-semibold text-[#1e2d6b]/60 transition-all hover:bg-[#1e2d6b]/10 hover:text-[#1e2d6b]"
             >
               {chip}
             </button>
           ))}
         </div>
 
-        <p className="mt-4 text-center text-[11px] font-medium uppercase tracking-[0.05em] text-[#1e2d6b]/35">
-          ✦ 50.000+ koleksi tersedia
+        <p className="mt-5 text-center text-[11px] font-bold uppercase tracking-[0.08em] text-[#1e2d6b]/40">
+          5.000 koleksi tersedia
         </p>
       </div>
 
       {/* ── Wave divider ── */}
-      <div className="pointer-events-none absolute bottom-0 left-0 w-full leading-none">
+      <div className="pointer-events-none absolute bottom-0 left-0 w-full leading-none z-0">
         <svg
           viewBox="0 0 1200 120"
           preserveAspectRatio="none"
-          className="h-12 w-full fill-[#F8FAFC]"
+          className="h-12 w-full fill-white"
         >
           <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" />
         </svg>

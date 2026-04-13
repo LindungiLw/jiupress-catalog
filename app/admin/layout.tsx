@@ -15,12 +15,12 @@ export default function AdminLayout({
   const menuItems = [
     { name: "Dashboard", href: "/admin", icon: <LayoutDashboard size={18} /> },
     {
-      name: "Katalog Produk",
+      name: "Product Catalog",
       href: "/admin/books",
       icon: <BookOpen size={18} />,
     },
     {
-      name: "Kategori",
+      name: "Categories",
       href: "/admin/books/categories",
       icon: <Tags size={18} />,
     },
@@ -28,16 +28,17 @@ export default function AdminLayout({
 
   return (
     <div className="flex h-screen w-full bg-[#f8fafc] font-[Plus_Jakarta_Sans,sans-serif] overflow-hidden text-[#1e2d6b]">
-      {/* SIDEBAR (Diperkecil lebarnya jadi w-56, padding dikurangi) */}
+      {/* SIDEBAR */}
       <aside className="w-56 bg-[#1e2d6b] text-white flex flex-col justify-between hidden md:flex shadow-xl z-20">
         <div>
-          {/* Logo Area (Tinggi dikurangi jadi h-14) */}
+          {/* Logo Area */}
           <div className="flex items-center justify-center h-14 border-b border-white/10">
             <h1 className="text-xl font-black tracking-tight font-poppins">
               JIU <span className="text-[#FFD32B]">Store</span>
             </h1>
           </div>
-          {/* Menu Items (Padding dan font diperkecil) */}
+
+          {/* Menu Items */}
           <nav className="mt-4 px-3 flex flex-col gap-1">
             {menuItems.map((item) => {
               const isActive =
@@ -58,23 +59,27 @@ export default function AdminLayout({
             })}
           </nav>
         </div>
+
         {/* Logout Area */}
         <div className="p-3 border-t border-white/10">
-          <Link
-            href="/"
-            className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-semibold text-white/70 hover:bg-red-500/20 hover:text-red-400 transition-all"
+          <button
+            onClick={async () => {
+              await fetch("/api/logout", { method: "POST" });
+              window.location.href = "/login"; // Force refresh and redirect to login
+            }}
+            className="flex w-full items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-semibold text-white/70 hover:bg-red-500/20 hover:text-red-400 transition-all"
           >
-            <LogOut size={18} /> Keluar
-          </Link>
+            <LogOut size={18} /> Logout
+          </button>
         </div>
       </aside>
 
       {/* MAIN CONTENT AREA */}
       <main className="flex-1 flex flex-col h-full overflow-y-auto">
-        {/* HEADER (Tinggi dikurangi jadi h-14) */}
+        {/* HEADER */}
         <header className="h-14 bg-white border-b border-gray-100 flex items-center justify-between px-6 z-10 sticky top-0 shadow-sm">
           <h2 className="text-sm font-bold text-[#1e2d6b] uppercase tracking-wider">
-            Panel Admin
+            Admin Panel
           </h2>
           <div className="flex items-center gap-5">
             <div className="flex items-center gap-3 border-l pl-5">
@@ -82,7 +87,7 @@ export default function AdminLayout({
                 A
               </div>
               <div className="hidden sm:block">
-                <p className="text-xs font-bold leading-tight">Admin JIU</p>
+                <p className="text-xs font-bold leading-tight">JIU Admin</p>
                 <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">
                   Store Manager
                 </p>
@@ -91,7 +96,7 @@ export default function AdminLayout({
           </div>
         </header>
 
-        {/* CONTAINER KONTEN UTAMA (Padding dikurangi jadi p-6) */}
+        {/* MAIN CONTENT CONTAINER */}
         <div className="p-6">{children}</div>
       </main>
     </div>

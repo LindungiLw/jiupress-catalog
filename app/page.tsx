@@ -1,16 +1,21 @@
-// app/page.tsx
+import { prisma } from "@/lib/prisma";
+import Hero from "../components/Hero";
 import NewBooks from "@/components/NewBooks";
-import Hero from "../components/Hero"; // Pastikan path-nya benar
-// HAPUS IMPORT NAVBAR DI SINI!
 
-export default function Home() {
+export default async function Home() {
+  // Fetch the 10 latest books from your Hostinger database
+  const latestBooks = await prisma.book.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 10,
+  });
+
   return (
     <main>
-      {/* Navbar JANGAN dipanggil di sini lagi karena sudah ada di layout.tsx */}
       <Hero />
-
-      {/* Nanti di bawah sini tinggal tambah Section Layanan, Berita, dll */}
-      <NewBooks />
+      {/* Pass the real database books to the NewBooks component */}
+      <NewBooks books={latestBooks} />
     </main>
   );
 }
