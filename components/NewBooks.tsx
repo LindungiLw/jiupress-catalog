@@ -110,7 +110,7 @@ const NewBooks = ({ books }: BookProps) => {
             })}
           </div>
 
-          {/* Tombol Geser Kanan */}
+          {/* Tombol Geser Kanan */} 
           <button
             onClick={() => scroll("right")}
             className="absolute right-0 md:-right-6 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/80 backdrop-blur-sm p-4 shadow-[0_10px_30px_rgba(30,45,107,0.2)] text-[#1e2d6b] opacity-0 transition-all duration-300 hover:bg-[#1e2d6b] hover:text-white group-hover/slider:opacity-100 hidden md:block border border-white"
