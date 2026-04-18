@@ -1,7 +1,12 @@
 "use client";
 
 import React, { useRef } from "react";
-import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  ShoppingBag,
+  MessageCircle,
+} from "lucide-react";
 
 interface BookProps {
   books: any[];
@@ -12,7 +17,7 @@ const NewBooks = ({ books }: BookProps) => {
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
-      const scrollAmount = 350;
+      const scrollAmount = 300;
       scrollRef.current.scrollBy({
         left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth",
@@ -21,101 +26,93 @@ const NewBooks = ({ books }: BookProps) => {
   };
 
   return (
-    <section className="w-full bg-[#f8fafc] px-[5%] py-20 font-[Plus_Jakarta_Sans,sans-serif] overflow-hidden">
+    // ── Padding atas (pt-0) agar mepet ke atas dan tetap menggunakan Poppins ──
+    <section className="w-full bg-[#f8fafc] px-[5%] pt-0 pb-20 font-[Poppins,sans-serif]">
       <div className="mx-auto max-w-7xl">
-        {/* ── Header Section ── */}
-        <div className="mb-4 flex flex-col items-start justify-between gap-4 md:flex-row md:items-end px-4 md:px-0">
-          <div>
-            <h2 className="text-sm font-bold tracking-widest text-[#FFD32B] uppercase mb-2">
-              Latest Collection
-            </h2>
-            <h3 className="text-3xl md:text-4xl font-extrabold text-[#1e2d6b] font-poppins">
-              New Arrivals This Month
-            </h3>
-          </div>
-
-          <button className="group flex items-center gap-2 text-sm font-bold text-[#1e2d6b] transition-all hover:text-[#FFD32B]">
-            View All Catalog
-            <ArrowRight
-              size={18}
-              className="transition-transform group-hover:translate-x-1"
-            />
-          </button>
+        {/* ── Header: "New Books" di Tengah ── */}
+        <div className="text-center mb-10">
+          <h3 className="text-3xl md:text-4xl font-black text-[#1e2d6b] tracking-tight">
+            New Books
+          </h3>
+          <div className="w-12 h-1.5 bg-[#FFD32B] mx-auto mt-3 rounded-full"></div>
         </div>
 
-        {/* ── Slider Area (Aesthetic Floating Design) ── */}
-        <div className="relative mt-8 group/slider">
+        {/* ── Slider Area ── */}
+        <div className="relative group/slider">
           {/* Tombol Geser Kiri */}
           <button
             onClick={() => scroll("left")}
-            className="absolute left-0 md:-left-6 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/80 backdrop-blur-sm p-4 shadow-[0_10px_30px_rgba(30,45,107,0.2)] text-[#1e2d6b] opacity-0 transition-all duration-300 hover:bg-[#1e2d6b] hover:text-white group-hover/slider:opacity-100 hidden md:block border border-white"
+            className="absolute -left-4 top-[40%] z-20 -translate-y-1/2 rounded-full bg-white p-3 shadow-[0_10px_30px_rgba(30,45,107,0.12)] text-[#1e2d6b] opacity-0 transition-all duration-300 hover:bg-[#1e2d6b] hover:text-white group-hover/slider:opacity-100 hidden md:block border border-gray-50"
           >
-            <ChevronLeft size={24} strokeWidth={2.5} />
+            <ChevronLeft size={20} strokeWidth={2.5} />
           </button>
 
           {/* Container Scroll */}
           <div
             ref={scrollRef}
-            className="flex items-center gap-6 md:gap-12 overflow-x-auto snap-x snap-mandatory py-16 px-4 md:px-12"
+            className="flex items-stretch gap-5 overflow-x-auto snap-x snap-mandatory py-4 px-2"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
             <style>{`
               div::-webkit-scrollbar { display: none; }
             `}</style>
 
-            {books.map((book, index) => {
-              // 🪄 RAHASIA DESAIN "RANDOM BERATURAN":
-              // Kalau urutan bukunya Genap (0,2,4) posisinya naik ke atas
-              // Kalau urutan bukunya Ganjil (1,3,5) posisinya turun ke bawah
-              const isEven = index % 2 === 0;
-              const staggerClass = isEven
-                ? "md:-translate-y-8"
-                : "md:translate-y-8";
+            {books.map((book) => (
+              // ── Kartu Minimalis ──
+              <div
+                key={book.id}
+                className="min-w-[240px] max-w-[240px] md:min-w-[280px] md:max-w-[280px] snap-start flex-shrink-0 bg-white rounded-[24px] p-3 shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] transition-all duration-300 border border-gray-100 group flex flex-col"
+              >
+                {/* ── Area Gambar & Hover Effect ── */}
+                <div className="w-full aspect-[4/5] rounded-[18px] overflow-hidden mb-4 bg-gray-50 relative">
+                  <img
+                    src={book.image}
+                    alt={book.title}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  />
 
-              return (
-                <div
-                  key={book.id}
-                  className={`relative flex-shrink-0 snap-center group cursor-pointer w-[160px] sm:w-[180px] md:w-[240px] transition-all duration-700 ease-out hover:z-20 ${staggerClass}`}
-                >
-                  {/* Naked Book Cover (Tanpa Kartu Putih) */}
-                  <div className="relative w-full aspect-[2/3] rounded-md md:rounded-xl overflow-hidden shadow-[0_15px_35px_rgba(30,45,107,0.15)] group-hover:shadow-[0_25px_50px_rgba(30,45,107,0.35)] transition-all duration-500 transform group-hover:scale-[1.08] group-hover:-translate-y-4">
-                    <img
-                      src={book.image}
-                      alt={book.title}
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
-
-                    {/* Overlay Gradient Halus (Muncul saat di-hover) */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#1e2d6b]/90 via-[#1e2d6b]/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-5">
-                      <button className="w-full bg-[#FFD32B] text-[#1e2d6b] font-bold text-sm py-2.5 rounded-lg transform translate-y-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100 shadow-md">
-                        Pinjam Buku
-                      </button>
-                    </div>
+                  {/* Badge Harga (Kanan Atas) */}
+                  <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md px-2.5 py-1.5 rounded-full text-[11px] font-black text-[#1e2d6b] shadow-sm z-10">
+                    Rp {new Intl.NumberFormat("id-ID").format(book.price)}
                   </div>
 
-                  {/* Info Buku Mengambang Halus di Bawah */}
-                  <div className="mt-5 text-center px-2 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
-                    <h4 className="text-base md:text-lg font-bold leading-tight text-[#1e2d6b] line-clamp-1 group-hover:text-[#FFD32B] transition-colors">
-                      {book.title}
-                    </h4>
-                    <p className="mt-1 text-xs md:text-sm font-medium text-gray-500 line-clamp-1">
-                      {book.author}
-                    </p>
-                    <p className="mt-2 text-xs font-bold text-indigo-600 uppercase tracking-widest">
-                      Rp {new Intl.NumberFormat("id-ID").format(book.price)}
-                    </p>
+                  {/* ── OVERLAY HOVER: Tombol Shopee & WA ── */}
+                  <div className="absolute inset-0 bg-[#1e2d6b]/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center gap-3 z-0">
+                    <button
+                      onClick={() => window.open("#", "_blank")}
+                      className="flex items-center gap-2 bg-[#EE4D2D] text-white px-5 py-2.5 rounded-xl font-bold text-sm transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 shadow-lg hover:bg-[#d74226] active:scale-95 w-3/4 justify-center"
+                    >
+                      <ShoppingBag size={18} /> Shopee
+                    </button>
+
+                    <button
+                      onClick={() => window.open("+62 812-6017-3697", "_blank")}
+                      className="flex items-center gap-2 bg-[#25D366] text-white px-5 py-2.5 rounded-xl font-bold text-sm transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-75 shadow-lg hover:bg-[#20b858] active:scale-95 w-3/4 justify-center"
+                    >
+                      <MessageCircle size={18} /> WhatsApp
+                    </button>
                   </div>
                 </div>
-              );
-            })}
+
+                {/* ── Area Teks (Minimalis) ── */}
+                <div className="px-2 pb-2 text-center flex flex-col justify-center flex-grow">
+                  <p className="text-[#FFD32B] text-[10px] font-bold uppercase tracking-widest mb-1">
+                    {book.author}
+                  </p>
+                  <h4 className="text-lg font-black text-[#1e2d6b] leading-snug line-clamp-2">
+                    {book.title}
+                  </h4>
+                </div>
+              </div>
+            ))}
           </div>
 
-          {/* Tombol Geser Kanan */} 
+          {/* Tombol Geser Kanan */}
           <button
             onClick={() => scroll("right")}
-            className="absolute right-0 md:-right-6 top-1/2 z-20 -translate-y-1/2 rounded-full bg-white/80 backdrop-blur-sm p-4 shadow-[0_10px_30px_rgba(30,45,107,0.2)] text-[#1e2d6b] opacity-0 transition-all duration-300 hover:bg-[#1e2d6b] hover:text-white group-hover/slider:opacity-100 hidden md:block border border-white"
+            className="absolute -right-4 top-[40%] z-20 -translate-y-1/2 rounded-full bg-white p-3 shadow-[0_10px_30px_rgba(30,45,107,0.12)] text-[#1e2d6b] opacity-0 transition-all duration-300 hover:bg-[#1e2d6b] hover:text-white group-hover/slider:opacity-100 hidden md:block border border-gray-50"
           >
-            <ChevronRight size={24} strokeWidth={2.5} />
+            <ChevronRight size={20} strokeWidth={2.5} />
           </button>
         </div>
       </div>

@@ -7,18 +7,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Ini adalah tabel Buku kamu
 model Book {
   id          Int      @id @default(autoincrement())
   title       String
   author      String
   description String?  @db.Text
   price       Int
-  image       String?  // Untuk simpan link gambar
+  discountPrice Int?
+  image       String?  
+  
+
+  category    String   @default("Umum") 
+  views       Int      @default(0)     
+  
   createdAt   DateTime @default(now())
 }
 
-// Ini adalah tabel Admin (untuk login nanti)
 model Admin {
   id       Int    @id @default(autoincrement())
   username String @unique

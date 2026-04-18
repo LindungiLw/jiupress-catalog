@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Search, BookOpen, Users, Tags, Globe, UserCircle } from "lucide-react";
+import { Search, BookOpen, Users, Tags, Globe } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -25,69 +25,74 @@ const Navbar = () => {
 
   return (
     <>
-      {/* ─── 1. TOP HEADER (Tetap Diam di Atas + Efek Kaca) ─── */}
+      {/* ─── 1. TOP HEADER ─── */}
       <header
         className={`fixed top-0 left-0 z-50 w-full px-6 transition-all duration-300 flex items-center justify-between ${
           isScrolled
-            ? "py-3 bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-100"
+            ? "py-3 bg-[#1e2d6b]/95 backdrop-blur-md shadow-lg border-b border-white/10"
             : "py-5 bg-transparent"
         }`}
       >
-        {/* Kiri: Logo */}
+        {/* Kiri: Logo JIU & Teks Press */}
         <Link
           href="/"
           className="flex items-center gap-2 group active:scale-95 transition-transform"
         >
-          <div className="bg-[#1e2d6b] text-white font-black text-xl px-4 py-1 rounded-full rounded-tr-none transition-transform group-hover:scale-105 shadow-sm">
-            JIU
+          {/* Logo Gambar JIU */}
+          <div className="w-9 h-9 relative rounded-full overflow-hidden flex items-center justify-center bg-white/10 backdrop-blur-sm group-hover:scale-105 transition-transform">
+            <img
+              src="/assets/jiu-library.png"
+              alt="JIU Logo"
+              className="w-full h-full object-contain"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = "none";
+                target.parentElement!.innerHTML =
+                  '<div class="bg-white text-[#1e2d6b] font-black text-xl w-full h-full flex items-center justify-center rounded-full">J</div>';
+              }}
+            />
           </div>
-          <span className="font-bold text-xl text-[#1e2d6b] tracking-tight">
-            Library
+
+          {/* Teks Press (Warna Putih) */}
+          <span className="font-bold text-xl text-white tracking-tight drop-shadow-sm">
+            Press
           </span>
         </Link>
 
-        {/* Kanan: Link Tambahan & Profil */}
+        {/* Kanan: Link Tambahan */}
         <div className="flex items-center gap-6">
           {/* Link Desktop */}
-          <div className="hidden md:flex items-center gap-8 text-sm font-bold text-[#1e2d6b]/70">
+          <div className="hidden md:flex items-center gap-8 text-sm font-bold text-white/80">
             <Link
-              href="/layanan"
-              className="hover:text-[#FFD32B] hover:-translate-y-0.5 transition-all"
+              href="/services"
+              className="hover:text-[#FFD32B] hover:-translate-y-0.5 transition-all drop-shadow-sm"
             >
               Layanan
             </Link>
             <Link
-              href="/tentang"
-              className="hover:text-[#FFD32B] hover:-translate-y-0.5 transition-all"
+              href="/about"
+              className="hover:text-[#FFD32B] hover:-translate-y-0.5 transition-all drop-shadow-sm"
             >
               Tentang Kami
             </Link>
             <Link
-              href="/bantuan"
-              className="hover:text-[#FFD32B] hover:-translate-y-0.5 transition-all"
+              href="/help"
+              className="hover:text-[#FFD32B] hover:-translate-y-0.5 transition-all drop-shadow-sm"
             >
               Bantuan?
             </Link>
           </div>
 
           {/* Ganti Bahasa */}
-          <button className="hidden md:flex items-center gap-1.5 text-[#1e2d6b]/70 hover:text-[#1e2d6b] hover:scale-105 active:scale-95 transition-all">
+          <button className="hidden md:flex items-center gap-1.5 text-white/80 hover:text-[#FFD32B] hover:scale-105 active:scale-95 transition-all drop-shadow-sm">
             <Globe size={18} />
             <span className="text-sm font-bold">ID</span>
           </button>
-
-          {/* Tombol Login */}
-          <Link
-            href="/login"
-            className="flex items-center gap-2 text-[#1e2d6b] hover:text-[#FFD32B] hover:scale-110 active:scale-90 transition-all"
-          >
-            <UserCircle size={32} strokeWidth={1.5} />
-          </Link>
         </div>
       </header>
 
-      {/* ─── 2. BOTTOM NAVIGATION BAR (Bawah: Menu & Search) ─── */}
-      <nav className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-100 shadow-[0_-8px_30px_rgba(0,0,0,0.06)] z-50 px-6 py-3 flex items-center justify-between md:justify-center md:gap-20 pb-safe">
+      {/* ─── 2. BOTTOM NAVIGATION BAR ─── */}
+      <nav className="fixed bottom-0 left-0 w-full bg-[#1e2d6b] border-t border-white/10 shadow-[0_-8px_30px_rgba(0,0,0,0.2)] z-50 px-6 py-3 flex items-center justify-between md:justify-center md:gap-20 pb-safe">
         {/* Tombol Search */}
         <button
           onClick={() => {
@@ -97,7 +102,7 @@ const Navbar = () => {
               500,
             );
           }}
-          className="flex flex-col md:flex-row items-center gap-1 md:gap-2 text-gray-400 hover:text-[#1e2d6b] hover:-translate-y-1 active:scale-90 transition-all group"
+          className="flex flex-col md:flex-row items-center gap-1 md:gap-2 text-white/50 hover:text-[#FFD32B] hover:-translate-y-1 active:scale-90 transition-all group"
         >
           <Search
             size={22}
@@ -113,8 +118,8 @@ const Navbar = () => {
           href="/"
           className={`flex flex-col md:flex-row items-center gap-1 md:gap-2 hover:-translate-y-1 active:scale-90 transition-all ${
             pathname === "/"
-              ? "text-[#1e2d6b]"
-              : "text-gray-400 hover:text-[#1e2d6b]"
+              ? "text-[#FFD32B]" // Menyala Kuning JIU saat aktif
+              : "text-white/50 hover:text-[#FFD32B]"
           }`}
         >
           <BookOpen
@@ -131,8 +136,8 @@ const Navbar = () => {
           href="/penulis"
           className={`flex flex-col md:flex-row items-center gap-1 md:gap-2 hover:-translate-y-1 active:scale-90 transition-all ${
             pathname === "/penulis"
-              ? "text-[#1e2d6b]"
-              : "text-gray-400 hover:text-[#1e2d6b]"
+              ? "text-[#FFD32B]"
+              : "text-white/50 hover:text-[#FFD32B]"
           }`}
         >
           <Users
@@ -149,8 +154,8 @@ const Navbar = () => {
           href="/kategori"
           className={`flex flex-col md:flex-row items-center gap-1 md:gap-2 hover:-translate-y-1 active:scale-90 transition-all ${
             pathname === "/kategori"
-              ? "text-[#1e2d6b]"
-              : "text-gray-400 hover:text-[#1e2d6b]"
+              ? "text-[#FFD32B]"
+              : "text-white/50 hover:text-[#FFD32B]"
           }`}
         >
           <Tags
