@@ -7,6 +7,11 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export default async function Home() {
+  // 0. Ambil data kategori untuk Hero Section
+  const categories = await prisma.category.findMany({
+    orderBy: { name: "asc" }, // Diurutkan berdasarkan abjad (A-Z)
+  });
+
   // 1. Ambil data buku terbaru
   const latestBooks = await prisma.book.findMany({
     orderBy: { createdAt: "desc" },
@@ -32,7 +37,9 @@ export default async function Home() {
   return (
     <main className="min-h-screen bg-white">
       <Navbar />
-      <Hero />
+
+      {/* ── Lempar data kategori yang didapat dari database ke Hero ── */}
+      <Hero categories={categories} />
 
       {/* 1. New Books (Selalu Tampil) */}
       <NewBooks books={latestBooks} />

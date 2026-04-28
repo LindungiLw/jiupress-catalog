@@ -91,8 +91,9 @@ const Navbar = () => {
         </div>
       </header>
 
-      {/* ─── 2. BOTTOM NAVIGATION BAR ─── */}
-      <nav className="fixed bottom-0 left-0 w-full bg-[#1e2d6b] border-t border-white/10 shadow-[0_-8px_30px_rgba(0,0,0,0.2)] z-50 px-6 py-3 flex items-center justify-between md:justify-center md:gap-20 pb-safe">
+      {/* ─── 2. BOTTOM NAVIGATION BAR (HANYA MUNCUL DI MOBILE / LAYAR KECIL) ─── */}
+      {/* Aku tambahkan md:hidden di sini! */}
+      <nav className="md:hidden fixed bottom-0 left-0 w-full bg-[#1e2d6b] border-t border-white/10 shadow-[0_-8px_30px_rgba(0,0,0,0.2)] z-50 px-6 py-3 flex items-center justify-between pb-safe">
         {/* Tombol Search */}
         <button
           onClick={() => {
@@ -102,13 +103,13 @@ const Navbar = () => {
               500,
             );
           }}
-          className="flex flex-col md:flex-row items-center gap-1 md:gap-2 text-white/50 hover:text-[#FFD32B] hover:-translate-y-1 active:scale-90 transition-all group"
+          className="flex flex-col items-center gap-1 text-white/50 hover:text-[#FFD32B] hover:-translate-y-1 active:scale-90 transition-all group"
         >
           <Search
             size={22}
             className="group-hover:stroke-[2.5px] transition-all"
           />
-          <span className="text-[10px] md:text-sm font-bold uppercase md:capitalize tracking-wider md:tracking-normal">
+          <span className="text-[10px] font-bold uppercase tracking-wider">
             Search
           </span>
         </button>
@@ -116,9 +117,9 @@ const Navbar = () => {
         {/* Menu Utama: Books */}
         <Link
           href="/"
-          className={`flex flex-col md:flex-row items-center gap-1 md:gap-2 hover:-translate-y-1 active:scale-90 transition-all ${
+          className={`flex flex-col items-center gap-1 hover:-translate-y-1 active:scale-90 transition-all ${
             pathname === "/"
-              ? "text-[#FFD32B]" // Menyala Kuning JIU saat aktif
+              ? "text-[#FFD32B]"
               : "text-white/50 hover:text-[#FFD32B]"
           }`}
         >
@@ -126,7 +127,7 @@ const Navbar = () => {
             size={22}
             className={pathname === "/" ? "stroke-[2.5px]" : ""}
           />
-          <span className="text-[10px] md:text-sm font-bold uppercase md:capitalize tracking-wider md:tracking-normal">
+          <span className="text-[10px] font-bold uppercase tracking-wider">
             Books
           </span>
         </Link>
@@ -134,7 +135,7 @@ const Navbar = () => {
         {/* Menu Utama: Authors */}
         <Link
           href="/penulis"
-          className={`flex flex-col md:flex-row items-center gap-1 md:gap-2 hover:-translate-y-1 active:scale-90 transition-all ${
+          className={`flex flex-col items-center gap-1 hover:-translate-y-1 active:scale-90 transition-all ${
             pathname === "/penulis"
               ? "text-[#FFD32B]"
               : "text-white/50 hover:text-[#FFD32B]"
@@ -144,7 +145,7 @@ const Navbar = () => {
             size={22}
             className={pathname === "/penulis" ? "stroke-[2.5px]" : ""}
           />
-          <span className="text-[10px] md:text-sm font-bold uppercase md:capitalize tracking-wider md:tracking-normal">
+          <span className="text-[10px] font-bold uppercase tracking-wider">
             Authors
           </span>
         </Link>
@@ -152,7 +153,7 @@ const Navbar = () => {
         {/* Menu Utama: Genres */}
         <Link
           href="/kategori"
-          className={`flex flex-col md:flex-row items-center gap-1 md:gap-2 hover:-translate-y-1 active:scale-90 transition-all ${
+          className={`flex flex-col items-center gap-1 hover:-translate-y-1 active:scale-90 transition-all ${
             pathname === "/kategori"
               ? "text-[#FFD32B]"
               : "text-white/50 hover:text-[#FFD32B]"
@@ -162,7 +163,7 @@ const Navbar = () => {
             size={22}
             className={pathname === "/kategori" ? "stroke-[2.5px]" : ""}
           />
-          <span className="text-[10px] md:text-sm font-bold uppercase md:capitalize tracking-wider md:tracking-normal">
+          <span className="text-[10px] font-bold uppercase tracking-wider">
             Genres
           </span>
         </Link>

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ExternalLink, MapPin, Phone, Mail, ShieldCheck } from "lucide-react"; // <-- Instagram sudah dihapus dari sini supaya tidak error
+import { ExternalLink, MapPin, Phone, Mail } from "lucide-react"; // <-- ShieldCheck dihapus
 
 const Footer = () => {
   return (
@@ -133,7 +133,7 @@ const Footer = () => {
                 target="_blank"
                 className="w-10 h-10 flex items-center justify-center bg-white/5 border border-white/10 rounded-full text-white hover:bg-[#FFD32B] hover:text-[#1e2d6b] hover:-translate-y-1 transition-all duration-300"
               >
-                {/* <-- Ini adalah SVG mentah pengganti icon Instagram dari lucide-react --> */}
+                {/* <-- SVG mentah pengganti icon Instagram --> */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="18"
@@ -160,14 +160,7 @@ const Footer = () => {
             &copy; 2026 Dream Blue Library, JIU.{" "}
             <span>All rights reserved.</span>
           </p>
-          <div className="flex gap-6">
-            <a
-              href="/admin/login"
-              className="flex items-center gap-2 hover:text-[#FFD32B] transition-colors"
-            >
-              <ShieldCheck size={16} /> Staff Login
-            </a>
-          </div>
+          {/* Bagian link Staff Login sudah dihapus dari sini */}
         </div>
       </div>
     </footer>

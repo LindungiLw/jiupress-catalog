@@ -3,37 +3,39 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Search } from "lucide-react";
 
-// ── Types ──────────────────────────────────────────────────────────────────
 interface KF {
   t: number;
   x: number;
   y: number;
 }
-type Phase = "climbL" | "climbR" | "walk";
+type Phase = "climb" | "climbR" | "walk";
 
-// ── Constants ─────────────────────────────────────────────────────────────
+export interface CategoryData {
+  id: number;
+  name: string;
+  icon: string;
+}
+
 const TOTAL_MS = 24000;
 const VIEW_W = 680;
 const CX = VIEW_W / 2;
 
-// Timeline: y=80 = ground level, y=0 = bar top (figure feet)
 const KEYFRAMES: KF[] = [
-  { t: 0, x: -90, y: 80 },
-  { t: 2800, x: -24, y: 80 }, // arrive at ladder base
-  { t: 3500, x: -17, y: 57 }, // rung 1
-  { t: 4200, x: -11, y: 36 }, // rung 2
-  { t: 4900, x: -5, y: 15 }, // rung 3
-  { t: 5500, x: 6, y: 0 }, // step onto bar top
-  { t: 8500, x: CX, y: 0 }, // centre (picks up book)
-  { t: 15000, x: VIEW_W - 6, y: 0 }, // right edge
-  { t: 15700, x: VIEW_W + 5, y: 15 }, // rung 3
-  { t: 16400, x: VIEW_W + 11, y: 36 }, // rung 2
-  { t: 17100, x: VIEW_W + 17, y: 57 }, // rung 1
-  { t: 17800, x: VIEW_W + 24, y: 80 }, // ground right
-  { t: TOTAL_MS, x: VIEW_W + 90, y: 80 },
+  { t: 0, x: -80, y: 80 },
+  { t: 2800, x: -20, y: 80 },
+  { t: 3500, x: -14, y: 60 },
+  { t: 4200, x: -8, y: 40 },
+  { t: 4900, x: -2, y: 20 },
+  { t: 5500, x: 4, y: 0 },
+  { t: 8500, x: CX, y: 0 },
+  { t: 15000, x: VIEW_W - 4, y: 0 },
+  { t: 15700, x: VIEW_W + 2, y: 20 },
+  { t: 16400, x: VIEW_W + 8, y: 40 },
+  { t: 17100, x: VIEW_W + 14, y: 60 },
+  { t: 17800, x: VIEW_W + 20, y: 80 },
+  { t: TOTAL_MS, x: VIEW_W + 80, y: 80 },
 ];
 
-// ── Helpers ────────────────────────────────────────────────────────────────
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const eio = (t: number) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t);
 const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
@@ -49,7 +51,7 @@ function getPos(e: number) {
       return { x: lerp(a.x, b.x, te), y: lerp(a.y, b.y, te) };
     }
   }
-  return { x: VIEW_W + 90, y: 80 };
+  return { x: VIEW_W + 80, y: 80 };
 }
 
 function getSpeed(e: number): number {
@@ -62,26 +64,19 @@ function getSpeed(e: number): number {
 }
 
 function getPhase(e: number): Phase {
-  if (e >= 2800 && e <= 5500) return "climbL";
+  if (e >= 2800 && e <= 5500) return "climb";
   if (e >= 15000 && e <= 17800) return "climbR";
   return "walk";
 }
 
-function calcKnee(fx: number, fy: number, side: number): [number, number] {
-  const kx = fx * 0.42 + 2.5 * side;
-  const midY = (-18 + fy) / 2;
-  const extra = Math.abs(fx) * 0.14;
-  return [kx, midY - 2.5 - extra];
-}
-
-const Hero: React.FC = () => {
+const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
   const [query, setQuery] = useState("");
   const svgRef = useRef<SVGSVGElement>(null);
   const rafRef = useRef<number>(0);
   const startRef = useRef<number | null>(null);
   const walkRef = useRef(0);
   const blinkTimerRef = useRef(0);
-  const isBlinkingRef = useRef(false);
+  const isBlinkRef = useRef(false);
   const blinkPhaseRef = useRef(0);
   const lastTsRef = useRef(0);
 
@@ -130,126 +125,126 @@ const Hero: React.FC = () => {
       const { x, y } = getPos(elapsed);
       const onBar = elapsed >= 5500 && elapsed <= 15000;
       const speed = getSpeed(elapsed);
-      const moving = speed > 4;
+      const moving = speed > 3;
       const phase = getPhase(elapsed);
 
       $<SVGGElement>("fig")?.setAttribute("transform", `translate(${x},${y})`);
 
+      // Shadow
       const shd = $<SVGEllipseElement>("shd");
       if (shd) {
-        shd.setAttribute("cy", onBar ? "12" : "5");
-        shd.setAttribute("rx", onBar ? "6" : "10");
-        shd.setAttribute("opacity", onBar ? "0" : "0.14");
+        shd.setAttribute("rx", onBar ? "5" : "9");
+        shd.setAttribute("opacity", onBar ? "0" : "0.12");
       }
 
-      const walkSpeed = Math.min(speed / 90, 1);
-      if (moving) walkRef.current += dt * 0.0042 * (0.4 + walkSpeed * 0.6);
-      const W = walkRef.current * Math.PI * 2;
-      const sinW = Math.sin(W);
-      const cosW = Math.cos(W);
+      if (moving) walkRef.current += dt * 0.004;
+      const s = Math.sin(walkRef.current * Math.PI * 2);
+      const c = Math.cos(walkRef.current * Math.PI * 2);
 
       const atPickup = elapsed >= 7800 && elapsed <= 10000;
-      const carrying = elapsed >= 10000 && elapsed <= 15200;
+      const carrying = elapsed >= 10000 && elapsed <= 15000;
 
-      if (phase === "climbL" || phase === "climbR") {
-        const dir = phase === "climbL" ? 1 : -1;
+      // ── CLIMBING ──────────────────────────────────────────────────────
+      if (phase === "climb" || phase === "climbR") {
+        const dir = phase === "climb" ? 1 : -1;
         const prog =
-          phase === "climbL"
+          phase === "climb"
             ? (elapsed - 2800) / 2700
             : (elapsed - 15000) / 2800;
-        const cs = Math.sin(prog * Math.PI * 5);
+        const cs = Math.sin(prog * Math.PI * 4);
 
-        const rKx = dir * 5 + cs * 4,
-          rKy = -10 + Math.abs(cs) * 3;
-        sl("rthigh", 0, -18, rKx, rKy);
-        sl("rshin", rKx, rKy, dir * 3 + cs * 2, 0);
-        sc("rknee", rKx, rKy);
+        const rKx = dir * 5 + cs * 3;
+        sl("rthigh", 2, -18, rKx, -10);
+        sl("rshin", rKx, -10, dir * 3 + cs * 2, 0);
+        sc("rknee", rKx, -10);
+        const lKx = -dir * 5 - cs * 3;
+        sl("lthigh", -2, -18, lKx, -10);
+        sl("lshin", lKx, -10, -dir * 3 - cs * 2, 0);
+        sc("lknee", lKx, -10);
 
-        const lKx = -dir * 5 - cs * 4,
-          lKy = -10 + Math.abs(cs) * 3;
-        sl("lthigh", 0, -18, lKx, lKy);
-        sl("lshin", lKx, lKy, -dir * 3 - cs * 2, 0);
-        sc("lknee", lKx, lKy);
+        const aS = Math.sin(prog * Math.PI * 4 + Math.PI) * 0.6;
+        sl("ruarm", 0, -36, dir * 8, -42 + aS * 5);
+        sl("rfarm", dir * 8, -42 + aS * 5, dir * 6, -36 + aS * 3);
+        sc("relbow", dir * 8, -42 + aS * 5);
+        sl("luarm", 0, -36, -dir * 8, -42 - aS * 5);
+        sl("lfarm", -dir * 8, -42 - aS * 5, -dir * 6, -36 - aS * 3);
+        sc("lelbow", -dir * 8, -42 - aS * 5);
 
-        const aS = Math.sin(prog * Math.PI * 5 + Math.PI);
-        sl("ruarm", 0, -39, dir * 7, -46 + aS * 7);
-        sl("rfarm", dir * 7, -46 + aS * 7, dir * 5, -37 + aS * 5);
-        sc("relbow", dir * 7, -46 + aS * 7);
-        sl("luarm", 0, -39, -dir * 7, -46 - aS * 7);
-        sl("lfarm", -dir * 7, -46 - aS * 7, -dir * 5, -37 - aS * 5);
-        sc("lelbow", -dir * 7, -46 - aS * 7);
+        // ── WALK — calm, low amplitude ─────────────────────────────────
       } else {
-        const rFx = moving ? sinW * 9 : 3;
-        const rLift = moving ? Math.max(0, sinW) * 6 : 0;
-        const rFy = -rLift;
+        const amp = moving ? 5 : 0;
+        const lift = moving ? 4 : 0;
 
-        const lFx = moving ? -sinW * 9 : -3;
-        const lLift = moving ? Math.max(0, -sinW) * 6 : 0;
-        const lFy = -lLift;
-
-        const [rKx, rKy] = calcKnee(rFx, rFy, 1);
-        const [lKx, lKy] = calcKnee(lFx, lFy, -1);
-
-        sl("rthigh", 0, -18, rKx, rKy);
-        sl("rshin", rKx, rKy, rFx, rFy);
+        // Right leg
+        const rFx = 2 + s * amp;
+        const rLift = moving ? Math.max(0, s) * lift : 0;
+        const rKx = lerp(2, rFx, 0.5) + 1.5;
+        const rKy = lerp(-18, 0, 0.5) - 2 - rLift * 0.3;
+        sl("rthigh", 2, -18, rKx, rKy);
+        sl("rshin", rKx, rKy, rFx, -rLift);
         sc("rknee", rKx, rKy);
-        sl("lthigh", 0, -18, lKx, lKy);
-        sl("lshin", lKx, lKy, lFx, lFy);
+
+        // Left leg
+        const lFx = -2 - s * amp;
+        const lLift = moving ? Math.max(0, -s) * lift : 0;
+        const lKx = lerp(-2, lFx, 0.5) - 1.5;
+        const lKy = lerp(-18, 0, 0.5) - 2 - lLift * 0.3;
+        sl("lthigh", -2, -18, lKx, lKy);
+        sl("lshin", lKx, lKy, lFx, -lLift);
         sc("lknee", lKx, lKy);
 
+        // Arms — gentle swing only
+        const armAmp = moving ? 5 : 0;
         if (carrying) {
-          const holdBob = Math.sin(ts * 0.003) * 1.5;
-          sl("ruarm", 0, -39, 12, -47 + holdBob);
-          sl("rfarm", 12, -47 + holdBob, 15, -55 + holdBob);
-          sc("relbow", 12, -47 + holdBob);
-          const lSwing = moving ? cosW * 8 : 2;
-          sl("luarm", 0, -39, -10, -31 + lSwing * 0.5);
-          sl("lfarm", -10, -31 + lSwing * 0.5, -8, -23);
-          sc("lelbow", -10, -31 + lSwing * 0.5);
+          // Right arm holds book near chest
+          sl("ruarm", 0, -36, 10, -40);
+          sl("rfarm", 10, -40, 12, -48);
+          sc("relbow", 10, -40);
+          // Left arm: very light swing
+          sl("luarm", 0, -36, -9, -29 + c * 2);
+          sl("lfarm", -9, -29 + c * 2, -7, -22);
+          sc("lelbow", -9, -29 + c * 2);
         } else {
-          const aSwing = moving ? cosW * 9 : 2;
-          sl("ruarm", 0, -39, 11, -31 - aSwing * 0.5);
-          sl("rfarm", 11, -31 - aSwing * 0.5, 9, -23);
-          sc("relbow", 11, -31 - aSwing * 0.5);
-          sl("luarm", 0, -39, -11, -31 + aSwing * 0.5);
-          sl("lfarm", -11, -31 + aSwing * 0.5, -9, -23);
-          sc("lelbow", -11, -31 + aSwing * 0.5);
+          sl("ruarm", 0, -36, 9, -29 - c * armAmp * 0.4);
+          sl("rfarm", 9, -29 - c * armAmp * 0.4, 7, -22);
+          sc("relbow", 9, -29 - c * armAmp * 0.4);
+          sl("luarm", 0, -36, -9, -29 + c * armAmp * 0.4);
+          sl("lfarm", -9, -29 + c * armAmp * 0.4, -7, -22);
+          sc("lelbow", -9, -29 + c * armAmp * 0.4);
         }
       }
 
+      // ── BOOK ──────────────────────────────────────────────────────────
       const bk = $<SVGGElement>("bk");
       const bg = $<SVGGElement>("bk-glow");
       const gc = bg?.querySelector("circle");
 
       if (atPickup) {
-        const prog = clamp01((elapsed - 7800) / 2200);
-        const floatY = lerp(-28, -56, eio(prog));
-        const floatX = lerp(0, 15, eio(prog));
+        const p = clamp01((elapsed - 7800) / 2200);
+        const bY = lerp(-22, -48, eio(p));
+        const bX = lerp(0, 12, eio(p));
         bk?.setAttribute("opacity", "1");
-        bg?.setAttribute("opacity", String(1 - prog * 0.5));
-        bk?.setAttribute("transform", `translate(${x + floatX},${y + floatY})`);
+        bg?.setAttribute("opacity", String(lerp(0.6, 0, eio(p))));
+        bk?.setAttribute("transform", `translate(${x + bX},${y + bY})`);
         if (gc) {
-          gc.setAttribute("cx", String(x + floatX));
-          gc.setAttribute("cy", String(y + floatY));
+          gc.setAttribute("cx", String(x + bX));
+          gc.setAttribute("cy", String(y + bY));
         }
       } else if (carrying) {
-        const holdBob = Math.sin(ts * 0.003) * 1.5;
         bk?.setAttribute("opacity", "1");
         bg?.setAttribute("opacity", "0");
-        bk?.setAttribute(
-          "transform",
-          `translate(${x + 15},${y - 55 + holdBob})`,
-        );
+        bk?.setAttribute("transform", `translate(${x + 12},${y - 48})`);
       } else {
         bk?.setAttribute("opacity", "0");
         bg?.setAttribute("opacity", "0");
       }
 
+      // ── LADDERS ───────────────────────────────────────────────────────
       const ll = $<SVGGElement>("lad-l");
       if (ll) {
         const op =
           elapsed > 2000 && elapsed < 5900
-            ? clamp01((elapsed - 2000) / 600) * clamp01((5900 - elapsed) / 500)
+            ? clamp01((elapsed - 2000) / 500) * clamp01((5900 - elapsed) / 400)
             : 0;
         ll.setAttribute("opacity", op.toFixed(2));
       }
@@ -257,36 +252,38 @@ const Hero: React.FC = () => {
       if (lr) {
         const op =
           elapsed > 14400 && elapsed < 18200
-            ? clamp01((elapsed - 14400) / 600) *
-              clamp01((18200 - elapsed) / 500)
+            ? clamp01((elapsed - 14400) / 500) *
+              clamp01((18200 - elapsed) / 400)
             : 0;
         lr.setAttribute("opacity", op.toFixed(2));
       }
 
+      // ── BLINK ─────────────────────────────────────────────────────────
       blinkTimerRef.current += dt;
-      if (!isBlinkingRef.current && blinkTimerRef.current > 3200) {
-        isBlinkingRef.current = true;
+      if (!isBlinkRef.current && blinkTimerRef.current > 3500) {
+        isBlinkRef.current = true;
         blinkPhaseRef.current = 0;
         blinkTimerRef.current = 0;
       }
-      if (isBlinkingRef.current) {
+      if (isBlinkRef.current) {
         blinkPhaseRef.current += dt;
         const bp = blinkPhaseRef.current;
-        const sc2 =
+        const scl =
           bp < 60
-            ? lerp(1, 0.06, bp / 60)
+            ? lerp(1, 0.05, bp / 60)
             : bp < 120
-              ? lerp(0.06, 1, (bp - 60) / 60)
+              ? lerp(0.05, 1, (bp - 60) / 60)
               : 1;
         [$<SVGEllipseElement>("eyr"), $<SVGEllipseElement>("eyl")].forEach(
-          (e) => e?.setAttribute("ry", (3 * sc2).toFixed(2)),
+          (e) => e?.setAttribute("ry", (2.5 * scl).toFixed(2)),
         );
-        if (bp > 120) isBlinkingRef.current = false;
+        if (bp > 120) isBlinkRef.current = false;
       }
 
+      // Mouth: small smile always, bigger when carrying book
       $<SVGPathElement>("mouth")?.setAttribute(
         "d",
-        carrying ? "M-5,-58 Q0,-51 5,-58" : "M-3.5,-58 Q0,-55 3.5,-58",
+        carrying ? "M-3.5,-52 Q0,-49 3.5,-52" : "M-3,-52 Q0,-50 3,-52",
       );
 
       rafRef.current = requestAnimationFrame(animate);
@@ -343,7 +340,6 @@ const Hero: React.FC = () => {
             <Search size={22} strokeWidth={2.2} />
           </span>
           <input
-            id="search-input"
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -358,6 +354,7 @@ const Hero: React.FC = () => {
           </button>
         </form>
 
+        {/* SVG overlay */}
         <div className="absolute top-0 left-0 w-full pointer-events-none z-20">
           <svg
             ref={svgRef}
@@ -366,367 +363,361 @@ const Hero: React.FC = () => {
             className="w-full overflow-visible"
             xmlns="http://www.w3.org/2000/svg"
           >
+            {/* Left ladder — perspective leaning, near rail thicker */}
             <g id="lad-l" opacity="0">
               <line
-                x1="-52"
+                x1="-50"
                 y1="80"
-                x2="-8"
-                y2="2"
+                x2="-12"
+                y2="1"
                 stroke="#1e2d6b"
-                strokeWidth="2"
+                strokeWidth="1.6"
                 strokeLinecap="round"
+                opacity={0.6}
               />
               <line
-                x1="-38"
+                x1="-34"
                 y1="80"
-                x2="6"
-                y2="2"
-                stroke="#1e2d6b"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              />
-              <line
-                x1="-52"
-                y1="80"
-                x2="-38"
-                y2="80"
-                stroke="#1e2d6b"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <line
-                x1="-40"
-                y1="57.6"
-                x2="-26"
-                y2="57.6"
-                stroke="#1e2d6b"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <line
-                x1="-28"
-                y1="36"
-                x2="-14"
-                y2="36"
-                stroke="#1e2d6b"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <line
-                x1="-16"
-                y1="14.4"
-                x2="-2"
-                y2="14.4"
-                stroke="#1e2d6b"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <line
-                x1="-8"
-                y1="2"
-                x2="6"
-                y2="2"
-                stroke="#1e2d6b"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <circle cx="-52" cy="80" r="3.5" fill="#1e2d6b" />
-              <circle cx="-38" cy="80" r="3.5" fill="#1e2d6b" />
-            </g>
-
-            <g id="lad-r" opacity="0">
-              <line
-                x1="732"
-                y1="80"
-                x2="688"
-                y2="2"
-                stroke="#1e2d6b"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <line
-                x1="718"
-                y1="80"
-                x2="674"
-                y2="2"
-                stroke="#1e2d6b"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-              />
-              <line
-                x1="718"
-                y1="80"
-                x2="732"
-                y2="80"
-                stroke="#1e2d6b"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <line
-                x1="706"
-                y1="57.6"
-                x2="720"
-                y2="57.6"
-                stroke="#1e2d6b"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <line
-                x1="694"
-                y1="36"
-                x2="708"
-                y2="36"
-                stroke="#1e2d6b"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <line
-                x1="682"
-                y1="14.4"
-                x2="696"
-                y2="14.4"
-                stroke="#1e2d6b"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <line
-                x1="674"
-                y1="2"
-                x2="688"
-                y2="2"
-                stroke="#1e2d6b"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <circle cx="718" cy="80" r="3.5" fill="#1e2d6b" />
-              <circle cx="732" cy="80" r="3.5" fill="#1e2d6b" />
-            </g>
-
-            <g id="bk-glow" opacity="0">
-              <circle cx="340" cy="-20" r="18" fill="#FFD32B" opacity="0.2" />
-            </g>
-
-            <g id="bk" opacity="0" transform="translate(340,-20)">
-              <rect
-                x="-12"
-                y="-9"
-                width="24"
-                height="18"
-                rx="2.5"
-                fill="#FFD32B"
-                stroke="#d4a800"
-                strokeWidth="1.2"
-              />
-              <line
-                x1="-1.5"
-                y1="-9"
-                x2="-1.5"
-                y2="9"
-                stroke="#d4a800"
-                strokeWidth="1.4"
-              />
-              <rect
-                x="-10"
-                y="-6"
-                width="7"
-                height="12"
-                rx="1.2"
-                fill="#fff"
-                opacity="0.55"
-              />
-              <line
-                x1="3"
-                y1="-4"
-                x2="9"
-                y2="-4"
-                stroke="#d4a800"
-                strokeWidth="1"
-              />
-              <line
-                x1="3"
-                y1="0"
-                x2="9"
-                y2="0"
-                stroke="#d4a800"
-                strokeWidth="1"
-              />
-              <line
-                x1="3"
-                y1="4"
-                x2="9"
-                y2="4"
-                stroke="#d4a800"
-                strokeWidth="1"
-              />
-            </g>
-
-            <g id="fig">
-              <ellipse
-                id="shd"
-                cx="0"
-                cy="5"
-                rx="10"
-                ry="3"
-                fill="rgba(30,45,107,0.14)"
-              />
-              <line
-                id="rthigh"
-                x1="0"
-                y1="-18"
-                x2="8"
-                y2="-9"
-                stroke="#1e2d6b"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-              <line
-                id="rshin"
-                x1="8"
-                y1="-9"
-                x2="5"
-                y2="0"
-                stroke="#1e2d6b"
-                strokeWidth="2.8"
-                strokeLinecap="round"
-              />
-              <circle id="rknee" cx="8" cy="-9" r="2.2" fill="#1e2d6b" />
-              <line
-                id="lthigh"
-                x1="0"
-                y1="-18"
-                x2="-8"
-                y2="-9"
-                stroke="#1e2d6b"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-              <line
-                id="lshin"
-                x1="-8"
-                y1="-9"
-                x2="-5"
-                y2="0"
-                stroke="#1e2d6b"
-                strokeWidth="2.8"
-                strokeLinecap="round"
-              />
-              <circle id="lknee" cx="-8" cy="-9" r="2.2" fill="#1e2d6b" />
-              <line
-                x1="0"
-                y1="-18"
-                x2="0"
-                y2="-46"
-                stroke="#1e2d6b"
-                strokeWidth="3.5"
-                strokeLinecap="round"
-              />
-              <rect
-                x="-13"
-                y="-44"
-                width="10"
-                height="16"
-                rx="2.5"
-                fill="#FFD32B"
-                stroke="#d4a800"
-                strokeWidth="1"
-              />
-              <rect
-                x="-12"
-                y="-31"
-                width="8"
-                height="3.5"
-                rx="1"
-                fill="#d4a800"
-                opacity="0.55"
-              />
-              <line
-                id="ruarm"
-                x1="0"
-                y1="-39"
-                x2="11"
-                y2="-31"
-                stroke="#1e2d6b"
-                strokeWidth="2.6"
-                strokeLinecap="round"
-              />
-              <line
-                id="rfarm"
-                x1="11"
-                y1="-31"
-                x2="9"
-                y2="-23"
-                stroke="#1e2d6b"
-                strokeWidth="2.6"
-                strokeLinecap="round"
-              />
-              <circle id="relbow" cx="11" cy="-31" r="1.8" fill="#1e2d6b" />
-              <line
-                id="luarm"
-                x1="0"
-                y1="-39"
-                x2="-11"
-                y2="-31"
-                stroke="#1e2d6b"
-                strokeWidth="2.6"
-                strokeLinecap="round"
-              />
-              <line
-                id="lfarm"
-                x1="-11"
-                y1="-31"
-                x2="-9"
-                y2="-23"
-                stroke="#1e2d6b"
-                strokeWidth="2.6"
-                strokeLinecap="round"
-              />
-              <circle id="lelbow" cx="-11" cy="-31" r="1.8" fill="#1e2d6b" />
-              <line
-                x1="0"
-                y1="-46"
-                x2="0"
-                y2="-51"
+                x2="2"
+                y2="1"
                 stroke="#1e2d6b"
                 strokeWidth="2.4"
                 strokeLinecap="round"
               />
-              <circle cx="0" cy="-62" r="12" fill="#1e2d6b" />
               <line
-                x1="-4"
-                y1="-73"
-                x2="-4"
-                y2="-79"
+                x1="-50"
+                y1="80"
+                x2="-34"
+                y2="80"
                 stroke="#1e2d6b"
-                strokeWidth="2.2"
+                strokeWidth="2"
                 strokeLinecap="round"
+              />
+              <line
+                x1="-41"
+                y1="61"
+                x2="-25"
+                y2="61"
+                stroke="#1e2d6b"
+                strokeWidth="1.9"
+                strokeLinecap="round"
+                opacity={0.85}
+              />
+              <line
+                x1="-31"
+                y1="41"
+                x2="-16"
+                y2="41"
+                stroke="#1e2d6b"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                opacity={0.75}
+              />
+              <line
+                x1="-22"
+                y1="21"
+                x2="-7"
+                y2="21"
+                stroke="#1e2d6b"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                opacity={0.65}
+              />
+              <line
+                x1="-12"
+                y1="1"
+                x2="2"
+                y2="1"
+                stroke="#1e2d6b"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+                opacity={0.55}
+              />
+              <circle cx="-50" cy="80" r="3" fill="#1e2d6b" />
+              <circle cx="-34" cy="80" r="3" fill="#1e2d6b" />
+            </g>
+
+            {/* Right ladder — mirrored */}
+            <g id="lad-r" opacity="0">
+              <line
+                x1="730"
+                y1="80"
+                x2="692"
+                y2="1"
+                stroke="#1e2d6b"
+                strokeWidth="1.6"
+                strokeLinecap="round"
+                opacity={0.6}
+              />
+              <line
+                x1="714"
+                y1="80"
+                x2="678"
+                y2="1"
+                stroke="#1e2d6b"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+              />
+              <line
+                x1="714"
+                y1="80"
+                x2="730"
+                y2="80"
+                stroke="#1e2d6b"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <line
+                x1="705"
+                y1="61"
+                x2="721"
+                y2="61"
+                stroke="#1e2d6b"
+                strokeWidth="1.9"
+                strokeLinecap="round"
+                opacity={0.85}
+              />
+              <line
+                x1="696"
+                y1="41"
+                x2="711"
+                y2="41"
+                stroke="#1e2d6b"
+                strokeWidth="1.7"
+                strokeLinecap="round"
+                opacity={0.75}
+              />
+              <line
+                x1="687"
+                y1="21"
+                x2="702"
+                y2="21"
+                stroke="#1e2d6b"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                opacity={0.65}
+              />
+              <line
+                x1="678"
+                y1="1"
+                x2="692"
+                y2="1"
+                stroke="#1e2d6b"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+                opacity={0.55}
+              />
+              <circle cx="730" cy="80" r="3" fill="#1e2d6b" />
+              <circle cx="714" cy="80" r="3" fill="#1e2d6b" />
+            </g>
+
+            {/* Book glow */}
+            <g id="bk-glow" opacity="0">
+              <circle
+                id="gc"
+                cx="340"
+                cy="-18"
+                r="16"
+                fill="#FFD32B"
+                opacity="0.15"
+              />
+            </g>
+
+            {/* Book — simple, clean */}
+            <g id="bk" opacity="0" transform="translate(340,-20)">
+              <rect
+                x="-10"
+                y="-8"
+                width="20"
+                height="16"
+                rx="2"
+                fill="#FFD32B"
+                stroke="#c49000"
+                strokeWidth="1.2"
               />
               <line
                 x1="0"
-                y1="-74"
+                y1="-8"
                 x2="0"
-                y2="-81"
+                y2="8"
+                stroke="#c49000"
+                strokeWidth="1.4"
+              />
+              <rect
+                x="-8"
+                y="-5"
+                width="6"
+                height="10"
+                rx="1"
+                fill="#fff"
+                opacity="0.4"
+              />
+            </g>
+
+            {/* Stick figure — clean, minimal */}
+            <g id="fig">
+              <ellipse
+                id="shd"
+                cx="0"
+                cy="4"
+                rx="9"
+                ry="2.5"
+                fill="rgba(30,45,107,0.12)"
+              />
+
+              {/* Legs */}
+              <line
+                id="rthigh"
+                x1="2"
+                y1="-18"
+                x2="7"
+                y2="-9"
                 stroke="#1e2d6b"
-                strokeWidth="2.2"
+                strokeWidth="2.8"
                 strokeLinecap="round"
               />
               <line
-                x1="4"
-                y1="-73"
+                id="rshin"
+                x1="7"
+                y1="-9"
                 x2="4"
-                y2="-79"
+                y2="0"
+                stroke="#1e2d6b"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              />
+              <circle id="rknee" cx="7" cy="-9" r="2" fill="#1e2d6b" />
+
+              <line
+                id="lthigh"
+                x1="-2"
+                y1="-18"
+                x2="-7"
+                y2="-9"
+                stroke="#1e2d6b"
+                strokeWidth="2.8"
+                strokeLinecap="round"
+              />
+              <line
+                id="lshin"
+                x1="-7"
+                y1="-9"
+                x2="-4"
+                y2="0"
+                stroke="#1e2d6b"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+              />
+              <circle id="lknee" cx="-7" cy="-9" r="2" fill="#1e2d6b" />
+
+              {/* Body */}
+              <line
+                x1="0"
+                y1="-18"
+                x2="0"
+                y2="-42"
+                stroke="#1e2d6b"
+                strokeWidth="3.2"
+                strokeLinecap="round"
+              />
+
+              {/* Bag — simple rectangle on back */}
+              <rect
+                x="-11"
+                y="-40"
+                width="8"
+                height="13"
+                rx="2.5"
+                fill="#FFD32B"
+                stroke="#c49000"
+                strokeWidth="1"
+              />
+
+              {/* Arms */}
+              <line
+                id="ruarm"
+                x1="0"
+                y1="-36"
+                x2="9"
+                y2="-29"
+                stroke="#1e2d6b"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+              />
+              <line
+                id="rfarm"
+                x1="9"
+                y1="-29"
+                x2="7"
+                y2="-22"
                 stroke="#1e2d6b"
                 strokeWidth="2.2"
                 strokeLinecap="round"
               />
-              <ellipse id="eyr" cx="4" cy="-63" rx="2" ry="3" fill="#fff" />
-              <ellipse id="eyl" cx="-4" cy="-63" rx="2" ry="3" fill="#fff" />
-              <circle id="pur" cx="4.6" cy="-62.5" r="1.2" fill="#1e2d6b" />
-              <circle id="pul" cx="-3.4" cy="-62.5" r="1.2" fill="#1e2d6b" />
+              <circle id="relbow" cx="9" cy="-29" r="1.6" fill="#1e2d6b" />
+
+              <line
+                id="luarm"
+                x1="0"
+                y1="-36"
+                x2="-9"
+                y2="-29"
+                stroke="#1e2d6b"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+              />
+              <line
+                id="lfarm"
+                x1="-9"
+                y1="-29"
+                x2="-7"
+                y2="-22"
+                stroke="#1e2d6b"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+              />
+              <circle id="lelbow" cx="-9" cy="-29" r="1.6" fill="#1e2d6b" />
+
+              {/* Neck */}
+              <line
+                x1="0"
+                y1="-42"
+                x2="0"
+                y2="-46"
+                stroke="#1e2d6b"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+              />
+
+              {/* Head */}
+              <circle cx="0" cy="-56" r="10" fill="#1e2d6b" />
+
+              {/* Eyes */}
+              <ellipse
+                id="eyr"
+                cx="3.5"
+                cy="-57"
+                rx="1.8"
+                ry="2.5"
+                fill="#fff"
+              />
+              <ellipse
+                id="eyl"
+                cx="-3.5"
+                cy="-57"
+                rx="1.8"
+                ry="2.5"
+                fill="#fff"
+              />
+              <circle id="pur" cx="4" cy="-56.5" r="1" fill="#1e2d6b" />
+              <circle id="pul" cx="-3" cy="-56.5" r="1" fill="#1e2d6b" />
+
+              {/* Mouth */}
               <path
                 id="mouth"
-                d="M-3.5,-58 Q0,-55 3.5,-58"
+                d="M-3,-52 Q0,-50 3,-52"
                 stroke="#fff"
-                strokeWidth="1.5"
+                strokeWidth="1.3"
                 fill="none"
                 strokeLinecap="round"
               />
@@ -737,19 +728,13 @@ const Hero: React.FC = () => {
 
       {/* Category chips */}
       <div className="relative z-10 flex flex-wrap justify-center gap-3 pb-8">
-        {[
-          { name: "Technology", icon: "💻" },
-          { name: "Business", icon: "💼" },
-          { name: "Law", icon: "⚖️" },
-          { name: "Design", icon: "🎨" },
-          { name: "Science", icon: "🧬" },
-        ].map((cat) => (
+        {categories.map((cat) => (
           <button
-            key={cat.name}
+            key={cat.id}
             type="button"
             onClick={() => {
               setQuery(cat.name);
-              window.location.href = `/katalog?q=${encodeURIComponent(cat.name)}`;
+              window.location.href = `/katalog?category=${encodeURIComponent(cat.name)}`;
             }}
             className="flex items-center gap-2 rounded-full bg-white/90 backdrop-blur-md border border-white/50 px-5 py-2.5 text-[13px] font-bold text-[#1e2d6b]/90 transition-all hover:bg-[#1e2d6b] hover:text-white hover:border-[#1e2d6b] hover:scale-105 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.05)] group"
           >
