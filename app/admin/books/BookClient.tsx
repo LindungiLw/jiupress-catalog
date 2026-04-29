@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Plus, Search, Edit, Trash2, FileBox, X, Save } from "lucide-react";
+import { Plus, Search, Edit, Trash2, LayoutGrid, X, Save } from "lucide-react";
 
 export default function BookClient({
   books: initialBooks,
@@ -16,7 +16,7 @@ export default function BookClient({
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [editingId, setEditingId] = useState<number | null>(null); // State untuk mendeteksi mode Edit
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   const defaultForm = {
     title: "",
@@ -50,18 +50,14 @@ export default function BookClient({
     }).format(number);
   };
 
-  // ── Fungsi Buka Modal Tambah ──
   const handleOpenAdd = () => {
     setEditingId(null);
     setFormData(defaultForm);
     setIsModalOpen(true);
   };
 
-  // ── Fungsi Buka Modal Edit ──
   const handleOpenEdit = (book: any) => {
     setEditingId(book.id);
-
-    // Format tanggal dari database (ISO) agar bisa masuk ke input type="date" & "datetime-local"
     const formatForDateInput = (isoString: string | null) =>
       isoString ? new Date(isoString).toISOString().split("T")[0] : "";
     const formatForDatetimeInput = (isoString: string | null) =>
@@ -83,7 +79,6 @@ export default function BookClient({
     setIsModalOpen(true);
   };
 
-  // ── Fungsi Simpan (Menangani POST & PUT) ──
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -102,25 +97,18 @@ export default function BookClient({
       const savedBook = await res.json();
 
       if (editingId) {
-        // Update data di tabel (Replace buku lama dengan hasil edit baru)
         setBookList(bookList.map((b) => (b.id === editingId ? savedBook : b)));
-        alert("Buku berhasil diperbarui!");
       } else {
-        // Tambah buku baru ke urutan atas tabel
         setBookList([savedBook, ...bookList]);
-        alert("Buku baru berhasil ditambahkan!");
       }
-
       setIsModalOpen(false);
     } catch (error) {
-      console.error(error);
       alert("Terjadi kesalahan saat menyimpan data.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // ── Fungsi Hapus ──
   const handleDelete = async (id: number) => {
     if (!confirm("Yakin ingin menghapus buku ini dari katalog?")) return;
     try {
@@ -133,41 +121,41 @@ export default function BookClient({
   };
 
   return (
-    <div className="flex flex-col gap-5 animate-in fade-in duration-300 p-2">
-      {/* ── HEADER ── */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-5 rounded-xl border border-gray-100 shadow-sm gap-4">
+    <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+      {/* HEADER */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm gap-4">
         <div>
-          <h3 className="text-xl font-bold text-[#1e2d6b]">
-            Manajemen Katalog
+          <h3 className="text-xl font-bold text-slate-800 tracking-tight">
+            Katalog Produk
           </h3>
-          <p className="text-gray-400 text-xs font-medium">
-            Total: {bookList.length} Buku Tersedia
+          <p className="text-slate-500 text-sm mt-1">
+            Kelola daftar buku yang tampil di halaman utama.
           </p>
         </div>
-        <div className="flex w-full md:w-auto gap-3">
-          <div className="relative w-full md:w-64">
+        <div className="flex flex-col sm:flex-row w-full md:w-auto gap-3">
+          <div className="relative w-full sm:w-64">
             <Search
               size={16}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
             />
             <input
               type="text"
-              placeholder="Cari buku..."
+              placeholder="Cari judul / penulis..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-gray-50 border border-gray-200 rounded-lg py-2 pl-9 pr-4 text-[13px] outline-none focus:border-[#1e2d6b]"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-9 pr-4 text-sm text-slate-700 outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
             />
           </div>
           <button
             onClick={handleOpenAdd}
-            className="bg-[#1e2d6b] text-white px-4 py-2 rounded-lg font-bold text-xs flex items-center gap-1.5 shadow-md hover:bg-[#2d3f8e] transition-all"
+            className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-blue-700 active:scale-95 transition-all shadow-sm"
           >
-            <Plus size={16} /> Tambah Produk
+            <Plus size={18} /> Tambah Buku
           </button>
         </div>
       </div>
 
-      {/* ── TABS KATEGORI ── */}
+      {/* TABS KATEGORI (Ikon dihilangkan) */}
       <div
         className="w-full overflow-x-auto pb-2"
         style={{ scrollbarWidth: "none" }}
@@ -175,7 +163,7 @@ export default function BookClient({
         <div className="flex gap-2 whitespace-nowrap">
           <button
             onClick={() => setActiveTab("Semua")}
-            className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all ${activeTab === "Semua" ? "bg-[#1e2d6b] text-white" : "bg-white text-gray-500 border-gray-200"}`}
+            className={`px-5 py-2 rounded-xl text-sm font-semibold border transition-all ${activeTab === "Semua" ? "bg-slate-800 text-white border-slate-800 shadow-md" : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50"}`}
           >
             Semua
           </button>
@@ -183,21 +171,21 @@ export default function BookClient({
             <button
               key={cat.id}
               onClick={() => setActiveTab(cat.name)}
-              className={`px-4 py-1.5 rounded-full text-xs font-bold border transition-all flex items-center gap-1 ${activeTab === cat.name ? "bg-[#1e2d6b] text-white" : "bg-white text-gray-500 border-gray-200 hover:bg-gray-50"}`}
+              className={`px-5 py-2 rounded-xl text-sm font-semibold border transition-all ${activeTab === cat.name ? "bg-slate-800 text-white border-slate-800 shadow-md" : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50"}`}
             >
-              <span>{cat.icon}</span> {cat.name}
+              {cat.name}
             </button>
           ))}
         </div>
       </div>
 
-      {/* ── TABEL BUKU ── */}
-      <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="px-5 py-3 border-b border-gray-100 bg-gray-50/50 flex items-center gap-2">
-          <FileBox size={14} className="text-[#1e2d6b]" />
-          <p className="text-xs font-bold text-[#1e2d6b]">
+      {/* TABEL BUKU */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2">
+          <LayoutGrid size={16} className="text-blue-600" />
+          <p className="text-sm font-semibold text-slate-700">
             Menampilkan{" "}
-            <span className="text-[#FFD32B] px-1 bg-[#1e2d6b] rounded">
+            <span className="text-blue-600 font-bold">
               {filteredBooks.length}
             </span>{" "}
             produk
@@ -205,31 +193,31 @@ export default function BookClient({
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left">
+          <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="border-b border-gray-100 bg-white">
-                <th className="px-5 py-4 text-[11px] font-bold text-gray-400 uppercase">
+              <tr className="border-b border-slate-200 bg-white">
+                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">
                   Judul & Penulis
                 </th>
-                <th className="px-5 py-4 text-[11px] font-bold text-gray-400 uppercase">
+                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">
                   Kategori
                 </th>
-                <th className="px-5 py-4 text-[11px] font-bold text-gray-400 uppercase">
+                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">
                   Harga
                 </th>
-                <th className="px-5 py-4 text-[11px] font-bold text-gray-400 uppercase text-right">
+                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">
                   Aksi
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-slate-100">
               {filteredBooks.map((book) => (
                 <tr
                   key={book.id}
-                  className="hover:bg-gray-50 transition-colors group"
+                  className="hover:bg-slate-50/80 transition-colors group"
                 >
-                  <td className="px-5 py-4 flex items-center gap-3">
-                    <div className="w-10 h-14 bg-gray-100 rounded border border-gray-200 overflow-hidden flex-shrink-0">
+                  <td className="px-6 py-4 flex items-center gap-4">
+                    <div className="w-12 h-16 bg-slate-100 rounded-lg border border-slate-200 overflow-hidden flex-shrink-0 shadow-sm">
                       {book.image ? (
                         <img
                           src={book.image}
@@ -237,48 +225,47 @@ export default function BookClient({
                           alt="cover"
                         />
                       ) : (
-                        <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 text-xs">
-                          No Img
+                        <div className="w-full h-full flex items-center justify-center text-slate-300 text-[10px] font-bold">
+                          NO IMG
                         </div>
                       )}
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-[#1e2d6b] line-clamp-1">
+                      <p className="text-sm font-bold text-slate-800 line-clamp-1">
                         {book.title}
                       </p>
-                      <p className="text-[11px] font-medium text-gray-400">
+                      <p className="text-xs font-medium text-slate-500 mt-0.5">
                         {book.author}
                       </p>
                     </div>
                   </td>
-                  <td className="px-5 py-4">
-                    <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-[10px] font-bold uppercase flex items-center gap-1 w-max">
-                      {book.category?.icon}{" "}
+                  <td className="px-6 py-4">
+                    <span className="bg-blue-50 text-blue-700 px-3 py-1.5 rounded-lg text-xs font-semibold w-max border border-blue-100/50">
                       {book.category?.name || "Uncategorized"}
                     </span>
                   </td>
-                  <td className="px-5 py-4 text-sm font-bold text-emerald-600">
-                    {formatRupiah(book.price)}
+                  <td className="px-6 py-4">
+                    <p className="text-sm font-bold text-slate-800">
+                      {formatRupiah(book.price)}
+                    </p>
                     {book.discountPrice && (
-                      <span className="ml-2 text-[10px] text-red-500 line-through">
+                      <p className="text-xs text-red-500 line-through mt-0.5">
                         {formatRupiah(book.discountPrice)}
-                      </span>
+                      </p>
                     )}
                   </td>
-                  <td className="px-5 py-4 text-right">
+                  <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      {/* Tombol Edit Aktif */}
                       <button
                         onClick={() => handleOpenEdit(book)}
-                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded"
+                        className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl"
                         title="Edit Buku"
                       >
                         <Edit size={16} />
                       </button>
-                      {/* Tombol Hapus Aktif */}
                       <button
                         onClick={() => handleDelete(book.id)}
-                        className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded"
+                        className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl"
                         title="Hapus Buku"
                       >
                         <Trash2 size={16} />
@@ -290,34 +277,34 @@ export default function BookClient({
             </tbody>
           </table>
           {filteredBooks.length === 0 && (
-            <div className="p-8 text-center text-gray-400 text-sm font-medium">
-              Tidak ada buku yang ditemukan.
+            <div className="p-12 text-center text-slate-500 text-sm font-medium">
+              Tidak ada data buku yang sesuai.
             </div>
           )}
         </div>
       </div>
 
-      {/* ── MODAL POP-UP TAMBAH/EDIT BUKU ── */}
+      {/* MODAL POP-UP TAMBAH/EDIT BUKU */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1e2d6b]/40 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-200">
           <div
             className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto"
             style={{ scrollbarWidth: "none" }}
           >
-            <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between z-10">
+            <div className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-slate-100 px-8 py-5 flex items-center justify-between z-10">
               <div>
-                <h3 className="text-xl font-black text-[#1e2d6b]">
+                <h3 className="text-xl font-bold text-slate-800">
                   {editingId ? "Edit Data Buku" : "Tambah Buku Baru"}
                 </h3>
-                <p className="text-xs text-gray-500">
+                <p className="text-sm text-slate-500 mt-1">
                   {editingId
-                    ? "Ubah detail informasi katalog buku ini"
-                    : "Masukkan metadata buku untuk katalog JIU Press"}
+                    ? "Perbarui informasi metadata buku."
+                    : "Lengkapi form untuk menambah katalog."}
                 </p>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="p-2 text-gray-400 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700 rounded-full transition-colors"
               >
                 <X size={20} />
               </button>
@@ -325,12 +312,11 @@ export default function BookClient({
 
             <form
               onSubmit={handleSubmit}
-              className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6"
+              className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8 bg-slate-50/30"
             >
-              {/* Kolom Kiri */}
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div>
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">
+                  <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">
                     Judul Buku *
                   </label>
                   <input
@@ -340,11 +326,11 @@ export default function BookClient({
                     onChange={(e) =>
                       setFormData({ ...formData, title: e.target.value })
                     }
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:border-[#1e2d6b]"
+                    className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">
+                  <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">
                     Sub Judul
                   </label>
                   <input
@@ -353,12 +339,12 @@ export default function BookClient({
                     onChange={(e) =>
                       setFormData({ ...formData, subtitle: e.target.value })
                     }
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:border-[#1e2d6b]"
+                    className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">
+                    <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">
                       Penulis *
                     </label>
                     <input
@@ -368,11 +354,11 @@ export default function BookClient({
                       onChange={(e) =>
                         setFormData({ ...formData, author: e.target.value })
                       }
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:border-[#1e2d6b]"
+                      className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">
+                    <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">
                       ISBN
                     </label>
                     <input
@@ -381,12 +367,12 @@ export default function BookClient({
                       onChange={(e) =>
                         setFormData({ ...formData, isbn: e.target.value })
                       }
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:border-[#1e2d6b]"
+                      className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">
+                  <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">
                     Kategori *
                   </label>
                   <select
@@ -395,21 +381,21 @@ export default function BookClient({
                     onChange={(e) =>
                       setFormData({ ...formData, categoryId: e.target.value })
                     }
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:border-[#1e2d6b] appearance-none"
+                    className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-slate-700"
                   >
                     <option value="" disabled>
                       -- Pilih Kategori --
                     </option>
                     {categories.map((cat) => (
                       <option key={cat.id} value={cat.id}>
-                        {cat.icon} {cat.name}
+                        {cat.name}
                       </option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">
-                    Link Gambar Cover (URL)
+                  <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">
+                    Link Cover (URL)
                   </label>
                   <input
                     type="url"
@@ -417,16 +403,16 @@ export default function BookClient({
                     onChange={(e) =>
                       setFormData({ ...formData, image: e.target.value })
                     }
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:border-[#1e2d6b]"
+                    className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                    placeholder="https://..."
                   />
                 </div>
               </div>
 
-              {/* Kolom Kanan */}
-              <div className="space-y-4">
+              <div className="space-y-5">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">
+                    <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">
                       Harga (Rp) *
                     </label>
                     <input
@@ -436,12 +422,12 @@ export default function BookClient({
                       onChange={(e) =>
                         setFormData({ ...formData, price: e.target.value })
                       }
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:border-[#1e2d6b]"
+                      className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">
-                      Harga Diskon (Rp)
+                    <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">
+                      Harga Diskon
                     </label>
                     <input
                       type="number"
@@ -452,14 +438,14 @@ export default function BookClient({
                           discountPrice: e.target.value,
                         })
                       }
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:border-[#1e2d6b]"
+                      className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                     />
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">
-                      Tgl Terbit Fisik
+                    <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">
+                      Tgl Rilis Fisik
                     </label>
                     <input
                       type="date"
@@ -470,12 +456,12 @@ export default function BookClient({
                           publishedDate: e.target.value,
                         })
                       }
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:border-[#1e2d6b]"
+                      className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-slate-700"
                     />
                   </div>
                   <div>
-                    <label className="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1 block">
-                      Jadwal Rilis Web *
+                    <label className="text-xs font-bold text-emerald-600 uppercase mb-2 block">
+                      Jadwal Tampil Web *
                     </label>
                     <input
                       type="datetime-local"
@@ -484,38 +470,37 @@ export default function BookClient({
                       onChange={(e) =>
                         setFormData({ ...formData, releaseAt: e.target.value })
                       }
-                      className="w-full bg-emerald-50 border border-emerald-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:border-emerald-500 text-emerald-700"
+                      className="w-full bg-emerald-50/50 border border-emerald-200 rounded-xl py-3 px-4 text-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 text-emerald-700"
                     />
                   </div>
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1 block">
-                    Deskripsi / Sinopsis
+                  <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">
+                    Deskripsi Sinopsis
                   </label>
                   <textarea
-                    rows={4}
+                    rows={5}
                     value={formData.description}
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
-                    className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 px-4 text-sm outline-none focus:border-[#1e2d6b] resize-none"
+                    className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 resize-none"
                   ></textarea>
                 </div>
               </div>
 
-              {/* Action Buttons */}
-              <div className="col-span-1 md:col-span-2 pt-4 border-t border-gray-100 flex justify-end gap-3">
+              <div className="col-span-1 md:col-span-2 pt-6 mt-2 border-t border-slate-200 flex justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-6 py-2.5 rounded-xl font-bold text-gray-500 hover:bg-gray-100 transition-all text-sm"
+                  className="px-6 py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-200 transition-all text-sm"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="bg-[#1e2d6b] text-white px-8 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-[#2d3f8e] active:scale-95 transition-all shadow-md disabled:opacity-50"
+                  className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-blue-700 active:scale-95 transition-all shadow-md disabled:opacity-50"
                 >
                   {isLoading ? (
                     "Menyimpan..."

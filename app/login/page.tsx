@@ -1,4 +1,4 @@
-"use client"; // Wajib ada agar tombol bisa diklik secara interaktif
+"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -7,77 +7,141 @@ export default function AdminLogin() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [isLoading, setIsLoading] = useState(false); // State baru untuk animasi loading
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault(); // Mencegah halaman reload
-    setErrorMsg(""); // Kosongkan error sebelumnya
+    e.preventDefault();
+    setErrorMsg("");
+    setIsLoading(true); // Mulai animasi loading saat tombol diklik
 
-    // Mengirim data ke otak/API yang tadi kita buat
-    const response = await fetch("/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
-    });
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
 
-    if (response.ok) {
-      alert("Login Sukses! Selamat datang Bos!");
-      // Nanti kita arahkan ke halaman Dashboard di sini
-      router.push("/admin");
-    } else {
-      const data = await response.json();
-      setErrorMsg(data.error); // Tampilkan pesan error
+      if (response.ok) {
+        // Biarkan isLoading tetap true agar tombol tidak berkedip kembali ke tulisan "Masuk"
+        // saat Next.js sedang proses pindah halaman
+        router.push("/admin");
+      } else {
+        const data = await response.json();
+        setErrorMsg(data.error);
+        setIsLoading(false); // Matikan loading jika gagal
+      }
+    } catch (error) {
+      setErrorMsg("Terjadi kesalahan pada server. Silakan coba lagi.");
+      setIsLoading(false); // Matikan loading jika error jaringan
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-96">
-        <h1 className="text-2xl font-bold mb-6 text-center text-blue-600">
-          Login Admin
-        </h1>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-200 p-4">
+      <div className="bg-white p-8 sm:p-10 rounded-2xl shadow-xl w-full max-w-md border border-slate-100">
+        {/* Header Section */}
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-extrabold text-slate-800 tracking-tight">
+            Admin Panel
+          </h1>
+          <p className="text-slate-500 mt-2 text-sm">
+            Silakan login untuk mengelola katalog JIU Press
+          </p>
+        </div>
 
-        {/* Jika ada error, tampilkan kotak merah ini */}
+        {/* Error Alert */}
         {errorMsg && (
-          <div className="bg-red-100 text-red-600 p-2 mb-4 rounded text-sm text-center">
-            {errorMsg}
+          <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-md animate-pulse">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <svg
+                  className="h-5 w-5 text-red-400"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-700 font-medium">{errorMsg}</p>
+              </div>
+            </div>
           </div>
         )}
 
-        <form onSubmit={handleLogin} className="flex flex-col gap-4">
+        <form onSubmit={handleLogin} className="space-y-6">
+          {/* Input Username */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-slate-700 mb-1">
               Username
             </label>
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="mt-1 p-2 w-full border rounded-md focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Masukkan username"
+              disabled={isLoading}
+              className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              placeholder="Masukkan username admin"
               required
             />
           </div>
 
+          {/* Input Password */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-slate-700 mb-1">
               Password
             </label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 p-2 w-full border rounded-md focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Masukkan password"
+              disabled={isLoading}
+              className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              placeholder="••••••••"
               required
             />
           </div>
 
+          {/* Submit Button with Loading State */}
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition mt-4"
+            disabled={isLoading}
+            className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600 transition-all mt-2 
+              ${isLoading ? "opacity-80 cursor-wait" : "hover:-translate-y-0.5"}`}
           >
-            Masuk
+            {isLoading ? (
+              <>
+                {/* SVG Spinner Animasi */}
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Memverifikasi...
+              </>
+            ) : (
+              "Masuk ke Dashboard"
+            )}
           </button>
         </form>
       </div>

@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, BookOpen, Tags, LogOut, Bell } from "lucide-react";
+import { LayoutDashboard, BookOpen, Tags, LogOut } from "lucide-react";
 
 export default function AdminLayout({
   children,
@@ -13,47 +13,61 @@ export default function AdminLayout({
   const pathname = usePathname();
 
   const menuItems = [
-    { name: "Dashboard", href: "/admin", icon: <LayoutDashboard size={18} /> },
+    { name: "Dashboard", href: "/admin", icon: <LayoutDashboard size={20} /> },
     {
       name: "Product Catalog",
       href: "/admin/books",
-      icon: <BookOpen size={18} />,
+      icon: <BookOpen size={20} />,
     },
     {
       name: "Categories",
       href: "/admin/books/categories",
-      icon: <Tags size={18} />,
+      icon: <Tags size={20} />,
     },
   ];
 
   return (
-    <div className="flex h-screen w-full bg-[#f8fafc] font-[Plus_Jakarta_Sans,sans-serif] overflow-hidden text-[#1e2d6b]">
-      {/* SIDEBAR */}
-      <aside className="w-56 bg-[#1e2d6b] text-white flex flex-col justify-between hidden md:flex shadow-xl z-20">
+    <div className="flex h-screen w-full bg-slate-50 font-[Plus_Jakarta_Sans,sans-serif] overflow-hidden text-slate-800">
+      {/* SIDEBAR - Menggunakan tema terang dengan border halus */}
+      <aside className="w-64 bg-white border-r border-slate-200 flex flex-col justify-between hidden md:flex z-20">
         <div>
           {/* Logo Area */}
-          <div className="flex items-center justify-center h-14 border-b border-white/10">
-            <h1 className="text-xl font-black tracking-tight font-poppins">
-              JIU <span className="text-[#FFD32B]">Store</span>
+          <div className="flex items-center h-16 px-6 border-b border-slate-100">
+            <h1 className="text-2xl font-extrabold tracking-tight text-slate-800">
+              JIU <span className="text-blue-600">Press</span>
             </h1>
           </div>
 
           {/* Menu Items */}
-          <nav className="mt-4 px-3 flex flex-col gap-1">
+          <nav className="mt-6 px-4 flex flex-col gap-2">
+            {/* Label Kategori Menu (Opsional, agar terlihat rapi) */}
+            <p className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
+              Menu Utama
+            </p>
+
             {menuItems.map((item) => {
+              // Logika active state yang lebih presisi
               const isActive =
-                pathname === item.href || pathname.startsWith(`${item.href}/`);
+                item.href === "/admin"
+                  ? pathname === "/admin"
+                  : pathname.startsWith(item.href);
+
               return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all ${
+                  className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium transition-all duration-200 group ${
                     isActive
-                      ? "bg-[#FFD32B] text-[#1e2d6b] shadow-sm"
-                      : "hover:bg-white/10 text-white/70 hover:text-white"
+                      ? "bg-blue-50 text-blue-700 shadow-sm border border-blue-100/50"
+                      : "text-slate-500 hover:bg-slate-50 hover:text-slate-800"
                   }`}
                 >
-                  {item.icon} {item.name}
+                  <div
+                    className={`${isActive ? "text-blue-600" : "text-slate-400 group-hover:text-slate-600"} transition-colors`}
+                  >
+                    {item.icon}
+                  </div>
+                  {item.name}
                 </Link>
               );
             })}
@@ -61,43 +75,53 @@ export default function AdminLayout({
         </div>
 
         {/* Logout Area */}
-        <div className="p-3 border-t border-white/10">
+        <div className="p-4 border-t border-slate-100">
           <button
             onClick={async () => {
               await fetch("/api/logout", { method: "POST" });
-              window.location.href = "/login"; // Force refresh and redirect to login
+              window.location.href = "/login";
             }}
-            className="flex w-full items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-semibold text-white/70 hover:bg-red-500/20 hover:text-red-400 transition-all"
+            className="flex w-full items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-slate-500 hover:bg-red-50 hover:text-red-600 hover:border-red-100 border border-transparent transition-all group"
           >
-            <LogOut size={18} /> Logout
+            <LogOut
+              size={20}
+              className="text-slate-400 group-hover:text-red-500 transition-colors"
+            />
+            Logout
           </button>
         </div>
       </aside>
 
       {/* MAIN CONTENT AREA */}
-      <main className="flex-1 flex flex-col h-full overflow-y-auto">
-        {/* HEADER */}
-        <header className="h-14 bg-white border-b border-gray-100 flex items-center justify-between px-6 z-10 sticky top-0 shadow-sm">
-          <h2 className="text-sm font-bold text-[#1e2d6b] uppercase tracking-wider">
+      <main className="flex-1 flex flex-col h-full overflow-y-auto relative">
+        {/* HEADER - Efek Glassmorphism */}
+        <header className="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-8 z-10 sticky top-0">
+          <h2 className="text-lg font-bold text-slate-800 tracking-tight">
             Admin Panel
           </h2>
-          <div className="flex items-center gap-5">
-            <div className="flex items-center gap-3 border-l pl-5">
-              <div className="w-8 h-8 rounded-full bg-[#1e2d6b] flex items-center justify-center text-white font-bold text-xs">
-                A
-              </div>
-              <div className="hidden sm:block">
-                <p className="text-xs font-bold leading-tight">JIU Admin</p>
-                <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">
-                  Store Manager
+
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 pl-4 border-l border-slate-200">
+              <div className="hidden sm:block text-right">
+                <p className="text-sm font-bold text-slate-700 leading-none">
+                  Admin
                 </p>
+                <p className="text-[11px] text-slate-400 font-medium mt-1">
+                  Manager
+                </p>
+              </div>
+              {/* Avatar dengan Gradient */}
+              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-blue-400 flex items-center justify-center text-white font-bold text-sm shadow-md border-2 border-white ring-2 ring-slate-100">
+                A
               </div>
             </div>
           </div>
         </header>
 
         {/* MAIN CONTENT CONTAINER */}
-        <div className="p-6">{children}</div>
+        <div className="p-8">
+          <div className="max-w-7xl mx-auto">{children}</div>
+        </div>
       </main>
     </div>
   );
