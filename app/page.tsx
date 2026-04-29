@@ -1,3 +1,6 @@
+// 1. Tambahkan baris ini di paling atas untuk mematikan cache
+export const dynamic = "force-dynamic";
+
 import { prisma } from "@/lib/prisma";
 import Hero from "@/components/Hero";
 import NewBooks from "@/components/NewBooks";
@@ -7,9 +10,9 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export default async function Home() {
-  // 0. Ambil data kategori untuk Hero Section
+  // 0. ambil data kategori
   const categories = await prisma.category.findMany({
-    orderBy: { name: "asc" }, // Diurutkan berdasarkan abjad (A-Z)
+    orderBy: { name: "asc" },
   });
 
   // 1. Ambil data buku terbaru
@@ -28,7 +31,7 @@ export default async function Home() {
   const discountBooks = await prisma.book.findMany({
     where: {
       discountPrice: {
-        not: null, // Filter hanya yang kolom discountPrice-nya tidak kosong
+        not: null,
       },
     },
     take: 4,
@@ -38,19 +41,14 @@ export default async function Home() {
     <main className="min-h-screen bg-white">
       <Navbar />
 
-      {/* ── Lempar data kategori yang didapat dari database ke Hero ── */}
       <Hero categories={categories} />
 
-      {/* 1. New Books (Selalu Tampil) */}
       <NewBooks books={latestBooks} />
 
-      {/* 2. Popular Books (Selalu Tampil) */}
       <PopularBooks books={popularBooks} />
 
-      {/* 3. Discount Books (Hanya akan muncul jika ada datanya di database) */}
       {discountBooks.length > 0 && <DiscountBooks books={discountBooks} />}
 
-      {/* 4. Footer (Selalu Tampil) */}
       <Footer />
     </main>
   );
