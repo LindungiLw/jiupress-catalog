@@ -23,7 +23,7 @@ const Footer = () => {
             <div className="flex items-center gap-3 mt-4 p-2 bg-white/5 border border-white/10 rounded-xl w-fit">
               <div className="relative w-[60px] h-[60px] bg-white p-1 rounded-lg overflow-hidden group cursor-pointer">
                 <img
-                  src="/assets/images/qr-idream.png"
+                  src="/assets/qr-idream.png"
                   alt="QR iDream JIU"
                   className="w-full h-full object-contain"
                 />
