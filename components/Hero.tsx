@@ -10,10 +10,10 @@ interface KF {
 }
 type Phase = "climb" | "climbR" | "walk";
 
+// INTERFACE DIUPDATE: icon dihapus
 export interface CategoryData {
   id: number;
   name: string;
-  icon: string;
 }
 
 const TOTAL_MS = 24000;
@@ -71,6 +71,11 @@ function getPhase(e: number): Phase {
 
 const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
   const [query, setQuery] = useState("");
+
+  // STATE BARU UNTUK SWIPER KATEGORI
+  const [catIndex, setCatIndex] = useState(0);
+  const [isHoveringCat, setIsHoveringCat] = useState(false);
+
   const svgRef = useRef<SVGSVGElement>(null);
   const rafRef = useRef<number>(0);
   const startRef = useRef<number | null>(null);
@@ -85,6 +90,26 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
     if (query.trim())
       window.location.href = `/katalog?q=${encodeURIComponent(query)}`;
   };
+
+  // LOGIKA AUTO-SWIPE (Setiap 2 detik)
+  useEffect(() => {
+    // Jika kategori kurang dari 5 atau sedang di-hover, jangan auto-swipe
+    if (!categories || categories.length <= 5 || isHoveringCat) return;
+
+    const interval = setInterval(() => {
+      setCatIndex((prev) => (prev + 1) % categories.length);
+    }, 2000); // 2000ms = 2 detik
+
+    return () => clearInterval(interval);
+  }, [categories, isHoveringCat]);
+
+  // Ambil maksimal 5 kategori saja untuk ditampilkan
+  const visibleCategories =
+    categories?.length <= 5
+      ? categories
+      : Array.from({ length: 5 }).map(
+          (_, i) => categories[(catIndex + i) % categories.length],
+        );
 
   const $ = useCallback(
     <T extends SVGElement>(id: string) =>
@@ -564,7 +589,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
                 ry="2.5"
                 fill="rgba(30,45,107,0.12)"
               />
-
               {/* Legs */}
               <line
                 id="rthigh"
@@ -587,7 +611,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
                 strokeLinecap="round"
               />
               <circle id="rknee" cx="7" cy="-9" r="2" fill="#1e2d6b" />
-
               <line
                 id="lthigh"
                 x1="-2"
@@ -609,7 +632,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
                 strokeLinecap="round"
               />
               <circle id="lknee" cx="-7" cy="-9" r="2" fill="#1e2d6b" />
-
               {/* Body */}
               <line
                 x1="0"
@@ -620,8 +642,7 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
                 strokeWidth="3.2"
                 strokeLinecap="round"
               />
-
-              {/* Bag — simple rectangle on back */}
+              {/* Bag */}
               <rect
                 x="-11"
                 y="-40"
@@ -632,7 +653,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
                 stroke="#c49000"
                 strokeWidth="1"
               />
-
               {/* Arms */}
               <line
                 id="ruarm"
@@ -655,7 +675,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
                 strokeLinecap="round"
               />
               <circle id="relbow" cx="9" cy="-29" r="1.6" fill="#1e2d6b" />
-
               <line
                 id="luarm"
                 x1="0"
@@ -677,7 +696,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
                 strokeLinecap="round"
               />
               <circle id="lelbow" cx="-9" cy="-29" r="1.6" fill="#1e2d6b" />
-
               {/* Neck */}
               <line
                 x1="0"
@@ -688,10 +706,8 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
                 strokeWidth="2.2"
                 strokeLinecap="round"
               />
-
               {/* Head */}
               <circle cx="0" cy="-56" r="10" fill="#1e2d6b" />
-
               {/* Eyes */}
               <ellipse
                 id="eyr"
@@ -711,7 +727,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
               />
               <circle id="pur" cx="4" cy="-56.5" r="1" fill="#1e2d6b" />
               <circle id="pul" cx="-3" cy="-56.5" r="1" fill="#1e2d6b" />
-
               {/* Mouth */}
               <path
                 id="mouth"
@@ -726,21 +741,23 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
         </div>
       </div>
 
-      {/* Category chips */}
-      <div className="relative z-10 flex flex-wrap justify-center gap-3 pb-8">
-        {categories.map((cat) => (
+      {/* Category SWIPER */}
+      <div
+        className="relative z-10 flex flex-wrap justify-center gap-3 pb-8 min-h-[60px]"
+        onMouseEnter={() => setIsHoveringCat(true)}
+        onMouseLeave={() => setIsHoveringCat(false)}
+      >
+        {visibleCategories.map((cat, index) => (
           <button
-            key={cat.id}
+            // Key ini penting agar animasi slide-in ter-trigger tiap kali daftar bergeser
+            key={`${cat.id}-${catIndex}-${index}`}
             type="button"
             onClick={() => {
               setQuery(cat.name);
               window.location.href = `/katalog?category=${encodeURIComponent(cat.name)}`;
             }}
-            className="flex items-center gap-2 rounded-full bg-white/90 backdrop-blur-md border border-white/50 px-5 py-2.5 text-[13px] font-bold text-[#1e2d6b]/90 transition-all hover:bg-[#1e2d6b] hover:text-white hover:border-[#1e2d6b] hover:scale-105 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.05)] group"
+            className="flex items-center gap-2 rounded-full bg-white/90 backdrop-blur-md border border-white/50 px-6 py-2.5 text-[14px] font-bold text-[#1e2d6b]/90 transition-all hover:bg-[#1e2d6b] hover:text-white hover:border-[#1e2d6b] hover:scale-105 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.05)] animate-in fade-in slide-in-from-right-4 duration-500"
           >
-            <span className="text-base group-hover:scale-110 transition-transform">
-              {cat.icon}
-            </span>
             {cat.name}
           </button>
         ))}

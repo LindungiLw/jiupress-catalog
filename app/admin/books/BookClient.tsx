@@ -1,7 +1,17 @@
 "use client";
 
 import React, { useState } from "react";
-import { Plus, Search, Edit, Trash2, LayoutGrid, X, Save } from "lucide-react";
+import {
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  LayoutGrid,
+  X,
+  Save,
+  Image as ImageIcon,
+  Link as LinkIcon,
+} from "lucide-react";
 
 export default function BookClient({
   books: initialBooks,
@@ -17,6 +27,9 @@ export default function BookClient({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+
+  // State baru untuk mode input gambar
+  const [imageInputType, setImageInputType] = useState<"url" | "upload">("url");
 
   const defaultForm = {
     title: "",
@@ -53,6 +66,7 @@ export default function BookClient({
   const handleOpenAdd = () => {
     setEditingId(null);
     setFormData(defaultForm);
+    setImageInputType("url"); // Reset ke URL
     setIsModalOpen(true);
   };
 
@@ -76,7 +90,28 @@ export default function BookClient({
       publishedDate: formatForDateInput(book.publishedDate),
       releaseAt: formatForDatetimeInput(book.releaseAt),
     });
+
+    // Cek apakah gambar yang tersimpan berupa Base64 (upload) atau URL biasa
+    if (book.image && book.image.startsWith("data:image")) {
+      setImageInputType("upload");
+    } else {
+      setImageInputType("url");
+    }
+
     setIsModalOpen(true);
+  };
+
+  // Fungsi baru untuk mengubah file gambar lokal menjadi Base64
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        // Menyimpan hasil convert Base64 ke dalam state formData.image
+        setFormData({ ...formData, image: reader.result as string });
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -155,7 +190,7 @@ export default function BookClient({
         </div>
       </div>
 
-      {/* TABS KATEGORI (Ikon dihilangkan) */}
+      {/* TABS KATEGORI */}
       <div
         className="w-full overflow-x-auto pb-2"
         style={{ scrollbarWidth: "none" }}
@@ -291,7 +326,7 @@ export default function BookClient({
             className="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto"
             style={{ scrollbarWidth: "none" }}
           >
-            <div className="sticky top-0 bg-white/80 backdrop-blur-md border-b border-slate-100 px-8 py-5 flex items-center justify-between z-10">
+            <div className="sticky top-0 bg-white/90 backdrop-blur-md border-b border-slate-100 px-8 py-5 flex items-center justify-between z-20">
               <div>
                 <h3 className="text-xl font-bold text-slate-800">
                   {editingId ? "Edit Data Buku" : "Tambah Buku Baru"}
@@ -393,20 +428,75 @@ export default function BookClient({
                     ))}
                   </select>
                 </div>
-                <div>
-                  <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">
-                    Link Cover (URL)
+
+                {/* === BAGIAN BARU: UPLOAD / LINK GAMBAR === */}
+                <div className="bg-white p-4 border border-slate-200 rounded-xl shadow-sm">
+                  <label className="text-xs font-bold text-slate-500 uppercase mb-3 block">
+                    Gambar / Cover Buku
                   </label>
-                  <input
-                    type="url"
-                    value={formData.image}
-                    onChange={(e) =>
-                      setFormData({ ...formData, image: e.target.value })
-                    }
-                    className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                    placeholder="https://..."
-                  />
+
+                  {/* Toggle Mode Input Gambar */}
+                  <div className="flex gap-4 mb-4">
+                    <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer hover:text-blue-600">
+                      <input
+                        type="radio"
+                        checked={imageInputType === "url"}
+                        onChange={() => setImageInputType("url")}
+                        className="text-blue-600 focus:ring-blue-500 w-4 h-4"
+                      />
+                      <LinkIcon size={16} /> Link URL
+                    </label>
+                    <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer hover:text-blue-600">
+                      <input
+                        type="radio"
+                        checked={imageInputType === "upload"}
+                        onChange={() => setImageInputType("upload")}
+                        className="text-blue-600 focus:ring-blue-500 w-4 h-4"
+                      />
+                      <ImageIcon size={16} /> Upload Lokal
+                    </label>
+                  </div>
+
+                  {/* Input Berdasarkan Mode yang Dipilih */}
+                  {imageInputType === "url" ? (
+                    <input
+                      type="url"
+                      value={formData.image}
+                      onChange={(e) =>
+                        setFormData({ ...formData, image: e.target.value })
+                      }
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg py-2.5 px-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                      placeholder="https://contoh.com/gambar.jpg"
+                    />
+                  ) : (
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-2 text-sm outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
+                    />
+                  )}
+
+                  {/* Area Preview Gambar */}
+                  {formData.image && (
+                    <div className="mt-4 flex items-center gap-4 p-3 bg-slate-50 rounded-lg border border-slate-100">
+                      <img
+                        src={formData.image}
+                        alt="Preview"
+                        className="h-20 w-14 object-cover rounded shadow-sm border border-slate-200"
+                      />
+                      <div className="text-xs text-slate-500">
+                        <p className="font-bold text-slate-700 mb-0.5">
+                          Preview Cover
+                        </p>
+                        <p className="line-clamp-2 break-all text-[10px]">
+                          {formData.image.substring(0, 60)}...
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
+                {/* === AKHIR BAGIAN GAMBAR === */}
               </div>
 
               <div className="space-y-5">
@@ -479,7 +569,7 @@ export default function BookClient({
                     Deskripsi Sinopsis
                   </label>
                   <textarea
-                    rows={5}
+                    rows={6}
                     value={formData.description}
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })

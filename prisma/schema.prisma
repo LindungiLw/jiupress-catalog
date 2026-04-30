@@ -31,7 +31,7 @@ model Book {
   // ── Data Katalog & Harga ──
   price         Int
   discountPrice Int?
-  image         String?  
+  image         String?   @db.LongText
 
   // ── Relasi Kategori ──
   categoryId    Int?
