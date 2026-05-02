@@ -21,7 +21,7 @@ export async function POST(req: Request) {
   try {
     const { name, icon } = await req.json();
     const newCategory = await prisma.category.create({
-      data: { name, icon },
+      data: { name },
     });
     return NextResponse.json(newCategory);
   } catch (error) {
