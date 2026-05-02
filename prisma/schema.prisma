@@ -7,11 +7,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ─── 1. TABEL KATEGORI BARU ───
 model Category {
   id    Int    @id @default(autoincrement())
   name  String @unique
-  icon  String // Menyimpan emoji, misal: "💻", "💼"
   
   // Relasi: 1 Kategori bisa dimiliki oleh banyak Buku
   books Book[] 
@@ -21,12 +19,12 @@ model Book {
   id            Int       @id @default(autoincrement())
   
   // ── Data Utama Buku ──
-  title         String    // Judul
-  subtitle      String?   // Sub judul (opsional)
-  isbn          String?   // ISBN (opsional karena mungkin ada buku yang belum ber-ISBN)
-  author        String    // Penulis
-  description   String?   @db.Text // Deskripsi
-  publishedDate DateTime? // Tanggal terbit (fisik) buku
+  title         String    
+  subtitle      String?  
+  isbn          String?   
+  author        String    
+  description   String?   @db.Text 
+  publishedDate DateTime?
   
   // ── Data Katalog & Harga ──
   price         Int
@@ -38,7 +36,7 @@ model Book {
   category      Category? @relation(fields: [categoryId], references: [id])
   
   // ── SISTEM PENJADWALAN (REALTIME PUBLISH) ──
-  releaseAt     DateTime  @default(now()) // Kapan buku ini boleh muncul di website
+  releaseAt     DateTime  @default(now()) 
   
   // ── Statistik ──
   views         Int       @default(0)      

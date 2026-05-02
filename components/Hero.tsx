@@ -343,15 +343,10 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
           className="mb-3 text-[clamp(32px,5vw,56px)] font-black leading-[1.1] tracking-tight text-[#1e2d6b] drop-shadow-sm"
           style={{ fontFamily: "Poppins, sans-serif" }}
         >
-          Search Knowledge.{" "}
-          <span className="relative inline-block text-[#e6b800]">
-            Fast.
-            <span className="absolute bottom-1 left-0 right-0 h-1.5 rounded bg-[#FFD32B] scale-x-[0.85] origin-left" />
-          </span>
+          Dream Blue Library{" "}
         </h1>
         <p className="mx-auto max-w-md text-[clamp(14px,1.5vw,16px)] font-bold leading-relaxed text-[#1e2d6b]/80 drop-shadow-sm">
-          Access thousands of JIU University library collections in one place
-          easily.
+          Literacy Freely, Legacy Fully.
         </p>
       </div>
 

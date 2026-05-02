@@ -460,8 +460,9 @@ export default function BookClient({
                   {/* Input Berdasarkan Mode yang Dipilih */}
                   {imageInputType === "url" ? (
                     <input
+                      key="input-url"
                       type="url"
-                      value={formData.image}
+                      value={formData.image || ""}
                       onChange={(e) =>
                         setFormData({ ...formData, image: e.target.value })
                       }
@@ -470,6 +471,7 @@ export default function BookClient({
                     />
                   ) : (
                     <input
+                      key="input-url"
                       type="file"
                       accept="image/*"
                       onChange={handleImageUpload}
