@@ -30,6 +30,7 @@ model Book {
   price         Int
   discountPrice Int?
   image         String?   @db.LongText
+  shopeeLink    String?
 
   // ── Relasi Kategori ──
   categoryId    Int?

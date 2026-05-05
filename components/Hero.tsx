@@ -343,11 +343,8 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
           className="mb-3 text-[clamp(32px,5vw,56px)] font-black leading-[1.1] tracking-tight text-[#1e2d6b] drop-shadow-sm"
           style={{ fontFamily: "Poppins, sans-serif" }}
         >
-          Dream Blue Library{" "}
+          Literacy Freely, Legacy Fully{" "}
         </h1>
-        <p className="mx-auto max-w-md text-[clamp(14px,1.5vw,16px)] font-bold leading-relaxed text-[#1e2d6b]/80 drop-shadow-sm">
-          Literacy Freely, Legacy Fully.
-        </p>
       </div>
 
       {/* Search stage */}

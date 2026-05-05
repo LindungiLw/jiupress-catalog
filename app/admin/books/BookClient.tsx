@@ -11,6 +11,7 @@ import {
   Save,
   Image as ImageIcon,
   Link as LinkIcon,
+  ShoppingBag,
 } from "lucide-react";
 
 export default function BookClient({
@@ -28,7 +29,6 @@ export default function BookClient({
   const [isLoading, setIsLoading] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
 
-  // State baru untuk mode input gambar
   const [imageInputType, setImageInputType] = useState<"url" | "upload">("url");
 
   const defaultForm = {
@@ -40,6 +40,7 @@ export default function BookClient({
     price: "",
     discountPrice: "",
     image: "",
+    shopeeLink: "",
     description: "",
     publishedDate: "",
     releaseAt: "",
@@ -66,7 +67,7 @@ export default function BookClient({
   const handleOpenAdd = () => {
     setEditingId(null);
     setFormData(defaultForm);
-    setImageInputType("url"); // Reset ke URL
+    setImageInputType("url");
     setIsModalOpen(true);
   };
 
@@ -86,12 +87,12 @@ export default function BookClient({
       price: String(book.price),
       discountPrice: book.discountPrice ? String(book.discountPrice) : "",
       image: book.image || "",
+      shopeeLink: book.shopeeLink || "",
       description: book.description || "",
       publishedDate: formatForDateInput(book.publishedDate),
       releaseAt: formatForDatetimeInput(book.releaseAt),
     });
 
-    // Cek apakah gambar yang tersimpan berupa Base64 (upload) atau URL biasa
     if (book.image && book.image.startsWith("data:image")) {
       setImageInputType("upload");
     } else {
@@ -101,13 +102,11 @@ export default function BookClient({
     setIsModalOpen(true);
   };
 
-  // Fungsi baru untuk mengubah file gambar lokal menjadi Base64
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        // Menyimpan hasil convert Base64 ke dalam state formData.image
         setFormData({ ...formData, image: reader.result as string });
       };
       reader.readAsDataURL(file);
@@ -178,7 +177,7 @@ export default function BookClient({
               placeholder="Cari judul / penulis..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-9 pr-4 text-sm text-slate-700 outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-9 pr-4 text-sm outline-none focus:bg-white focus:border-blue-500 focus:ring-2 transition-all"
             />
           </div>
           <button
@@ -429,13 +428,26 @@ export default function BookClient({
                   </select>
                 </div>
 
-                {/* === BAGIAN BARU: UPLOAD / LINK GAMBAR === */}
+                {/* === INPUT LINK SHOPEE === */}
+                <div>
+                  <label className="text-xs font-bold text-orange-600 uppercase mb-2 flex items-center gap-1">
+                    <ShoppingBag size={14} /> Link Shopee
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.shopeeLink}
+                    onChange={(e) =>
+                      setFormData({ ...formData, shopeeLink: e.target.value })
+                    }
+                    className="w-full bg-orange-50/50 border border-orange-200 rounded-xl py-3 px-4 text-sm outline-none focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 placeholder:text-orange-300 text-orange-800"
+                    placeholder="https://shopee.co.id/..."
+                  />
+                </div>
+
                 <div className="bg-white p-4 border border-slate-200 rounded-xl shadow-sm">
                   <label className="text-xs font-bold text-slate-500 uppercase mb-3 block">
                     Gambar / Cover Buku
                   </label>
-
-                  {/* Toggle Mode Input Gambar */}
                   <div className="flex gap-4 mb-4">
                     <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer hover:text-blue-600">
                       <input
@@ -456,8 +468,6 @@ export default function BookClient({
                       <ImageIcon size={16} /> Upload Lokal
                     </label>
                   </div>
-
-                  {/* Input Berdasarkan Mode yang Dipilih */}
                   {imageInputType === "url" ? (
                     <input
                       key="input-url"
@@ -471,15 +481,13 @@ export default function BookClient({
                     />
                   ) : (
                     <input
-                      key="input-url"
+                      key="input-file"
                       type="file"
                       accept="image/*"
                       onChange={handleImageUpload}
                       className="w-full bg-slate-50 border border-slate-200 rounded-lg py-2 px-2 text-sm outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-blue-100 file:text-blue-700 hover:file:bg-blue-200"
                     />
                   )}
-
-                  {/* Area Preview Gambar */}
                   {formData.image && (
                     <div className="mt-4 flex items-center gap-4 p-3 bg-slate-50 rounded-lg border border-slate-100">
                       <img
@@ -498,7 +506,6 @@ export default function BookClient({
                     </div>
                   )}
                 </div>
-                {/* === AKHIR BAGIAN GAMBAR === */}
               </div>
 
               <div className="space-y-5">

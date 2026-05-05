@@ -54,13 +54,12 @@ export default async function BookDetailPage({
 
         {/* SATU KANVAS PUTIH UTAMA */}
         <div className="bg-white rounded-[2rem] p-6 md:p-10 lg:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
-          {/* === MENGGUNAKAN GRID AGAR UKURAN TERKUNCI MUTLAK === */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
             {/* =========================================
                 KOLOM KIRI (JATAH 8 KOLOM): TEKS & SINOPSIS 
                 ========================================= */}
             <div className="lg:col-span-8 flex flex-col text-left order-2 lg:order-1">
-              {/* Header: Kategori, Judul, Subjudul */}
+              {/* Header */}
               <div className="mb-8">
                 <span className="inline-block px-4 py-1.5 bg-blue-50 text-blue-600 rounded-full text-xs font-bold uppercase tracking-widest mb-4 border border-blue-100">
                   {book.category?.name || "Kategori Umum"}
@@ -75,7 +74,7 @@ export default async function BookDetailPage({
                 )}
               </div>
 
-              {/* Meta Data: Penulis, ISBN, Tanggal */}
+              {/* Meta Data */}
               <div className="flex flex-wrap items-center gap-x-10 gap-y-6 py-6 border-y border-slate-100 mb-8">
                 <div>
                   <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1.5">
@@ -85,7 +84,6 @@ export default async function BookDetailPage({
                     {book.author}
                   </p>
                 </div>
-
                 <div>
                   <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1.5">
                     ISBN
@@ -95,7 +93,6 @@ export default async function BookDetailPage({
                     {book.isbn || "Tidak Ada"}
                   </p>
                 </div>
-
                 <div>
                   <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1.5">
                     Tanggal Terbit
@@ -129,7 +126,7 @@ export default async function BookDetailPage({
                 KOLOM KANAN (JATAH 4 KOLOM): GAMBAR & KARTU 
                 ========================================= */}
             <div className="lg:col-span-4 flex flex-col items-center w-full order-1 lg:order-2 lg:sticky lg:top-32">
-              {/* GAMBAR BUKU (Dikunci maksimal 260px agar tidak raksasa) */}
+              {/* GAMBAR BUKU */}
               <div className="w-full max-w-[260px] aspect-[3/4] rounded-[1.5rem] overflow-hidden shadow-lg border border-slate-100 bg-slate-50 mb-8">
                 <img
                   src={
@@ -141,7 +138,7 @@ export default async function BookDetailPage({
                 />
               </div>
 
-              {/* KARTU PEMBAYARAN ESTETIK (Lebar mengikuti kolom) */}
+              {/* KARTU PEMBAYARAN ESTETIK */}
               <div className="w-full border border-slate-200 rounded-[1.5rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white">
                 {/* Box Harga */}
                 <div className="p-6 bg-slate-50/50 border-b border-slate-100 text-center">
@@ -170,28 +167,42 @@ export default async function BookDetailPage({
                     Pilih Metode Pembelian:
                   </p>
 
-                  {/* Tombol Shopee */}
+                  {/* Tombol Shopee (Dinamis dari Database) */}
                   <a
-                    href="#"
-                    target="_blank"
+                    href={book.shopeeLink || "#"}
+                    target={book.shopeeLink ? "_blank" : "_self"}
                     rel="noreferrer"
-                    className="flex items-center justify-between p-4 rounded-xl border border-orange-200 bg-orange-50 hover:bg-orange-100 hover:border-orange-300 transition-all group"
+                    className={`flex items-center justify-between p-4 rounded-xl transition-all group ${
+                      book.shopeeLink
+                        ? "border border-orange-200 bg-orange-50 hover:bg-orange-100 hover:border-orange-300"
+                        : "border border-slate-200 bg-slate-50 opacity-60 cursor-not-allowed"
+                    }`}
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 group-hover:bg-orange-500 group-hover:text-white transition-colors">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center transition-colors ${
+                          book.shopeeLink
+                            ? "bg-orange-100 text-orange-600 group-hover:bg-orange-500 group-hover:text-white"
+                            : "bg-slate-200 text-slate-400"
+                        }`}
+                      >
                         <ShoppingBag size={16} />
                       </div>
-                      <span className="font-bold text-orange-800 text-sm">
-                        Beli di Shopee
+                      <span
+                        className={`font-bold text-sm ${book.shopeeLink ? "text-orange-800" : "text-slate-400"}`}
+                      >
+                        {book.shopeeLink ? "Beli di Shopee" : "Belum Tersedia"}
                       </span>
                     </div>
-                    <ChevronRight
-                      size={18}
-                      className="text-orange-400 group-hover:translate-x-1 group-hover:text-orange-600 transition-all"
-                    />
+                    {book.shopeeLink && (
+                      <ChevronRight
+                        size={18}
+                        className="text-orange-400 group-hover:translate-x-1 group-hover:text-orange-600 transition-all"
+                      />
+                    )}
                   </a>
 
-                  {/* Tombol WhatsApp */}
+                  {/* Tombol WhatsApp (Tetap/Statis) */}
                   <a
                     href="https://wa.me/6281260173697"
                     target="_blank"
