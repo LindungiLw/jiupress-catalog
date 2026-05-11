@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Search, BookOpen, Users, Tags } from "lucide-react"; // <-- Globe sudah dihapus
+import { Search, BookOpen, Users, Tags } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -9,7 +9,6 @@ const Navbar = () => {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // Efek untuk mendeteksi apakah layar sedang di-scroll
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 20) {
@@ -27,61 +26,58 @@ const Navbar = () => {
     <>
       {/* ─── 1. TOP HEADER ─── */}
       <header
-        className={`fixed top-0 left-0 z-50 w-full transition-all duration-300 flex items-center justify-between 
-        px-6 md:px-12 lg:px-16 xl:px-24 
-        ${
+        className={`fixed top-0 left-0 z-50 w-full transition-all duration-300 ${
           isScrolled
             ? "py-3 bg-[#1e2d6b]/95 backdrop-blur-md shadow-lg border-b border-white/10"
             : "py-5 bg-transparent"
         }`}
       >
-        {/* Kiri: Logo Typografi JIU Press */}
-        <Link
-          href="/"
-          className="flex items-center group active:scale-95 transition-transform"
-        >
-          {/* Logo Teks Baru (Tipografi Estetik) */}
-          <div className="flex items-baseline group-hover:scale-105 transition-transform duration-300 origin-left">
-            <span className="font-black text-2xl text-[#FFD32B] tracking-tighter drop-shadow-md">
-              JIU
-            </span>
-            <span className="font-semibold text-2xl text-white tracking-tight drop-shadow-sm ml-1">
-              Press
-            </span>
-            <span className="w-1.5 h-1.5 bg-[#FFD32B] rounded-full ml-1 mb-1 shadow-[0_0_8px_#FFD32B]"></span>
-          </div>
-        </Link>
+        {/* KUNCI: Wrapper max-w-7xl agar sejajar dengan konten utama di bawahnya */}
+        <div className="mx-auto w-full max-w-7xl px-5 md:px-8 flex items-center justify-between">
+          {/* Kiri: Logo Typografi JIU Press */}
+          <Link
+            href="/"
+            className="flex items-center group active:scale-95 transition-transform"
+          >
+            <div className="flex items-baseline group-hover:scale-105 transition-transform duration-300 origin-left">
+              <span className="font-black text-2xl text-[#FFD32B] tracking-tighter drop-shadow-md">
+                JIU
+              </span>
+              <span className="font-semibold text-2xl text-white tracking-tight drop-shadow-sm ml-1">
+                Press
+              </span>
+              <span className="w-1.5 h-1.5 bg-[#FFD32B] rounded-full ml-1 mb-1 shadow-[0_0_8px_#FFD32B]"></span>
+            </div>
+          </Link>
 
-        {/* Kanan: Link Tambahan */}
-        <div className="flex items-center">
-          {/* Link Desktop */}
-          <div className="hidden md:flex items-center gap-8 lg:gap-12 text-sm font-bold text-white/90">
-            <Link
-              href="/services"
-              className="hover:text-[#FFD32B] hover:-translate-y-0.5 transition-all drop-shadow-sm"
-            >
-              Layanan
-            </Link>
-            <Link
-              href="/about"
-              className="hover:text-[#FFD32B] hover:-translate-y-0.5 transition-all drop-shadow-sm"
-            >
-              Tentang Kami
-            </Link>
-            <Link
-              href="/help"
-              className="hover:text-[#FFD32B] hover:-translate-y-0.5 transition-all drop-shadow-sm"
-            >
-              Bantuan?
-            </Link>
+          {/* Kanan: Link Tambahan */}
+          <div className="flex items-center">
+            <div className="hidden md:flex items-center gap-8 lg:gap-12 text-sm font-bold text-white/90">
+              <Link
+                href="/services"
+                className="hover:text-[#FFD32B] hover:-translate-y-0.5 transition-all drop-shadow-sm"
+              >
+                Layanan
+              </Link>
+              <Link
+                href="/about"
+                className="hover:text-[#FFD32B] hover:-translate-y-0.5 transition-all drop-shadow-sm"
+              >
+                Tentang Kami
+              </Link>
+              <Link
+                href="/help"
+                className="hover:text-[#FFD32B] hover:-translate-y-0.5 transition-all drop-shadow-sm"
+              >
+                Bantuan?
+              </Link>
+            </div>
           </div>
-          {/* Tombol Ganti Bahasa sudah dihapus dari sini */}
         </div>
       </header>
 
       {/* ─── 2. BOTTOM NAVIGATION BAR (HANYA MUNCUL DI MOBILE / LAYAR KECIL) ─── */}
       <nav className="md:hidden fixed bottom-0 left-0 w-full bg-[#1e2d6b] border-t border-white/10 shadow-[0_-8px_30px_rgba(0,0,0,0.2)] z-50 px-6 py-3 flex items-center justify-between pb-safe">
-        {/* Tombol Search */}
         <button
           onClick={() => {
             window.scrollTo({ top: 0, behavior: "smooth" });
@@ -101,7 +97,6 @@ const Navbar = () => {
           </span>
         </button>
 
-        {/* Menu Utama: Books */}
         <Link
           href="/"
           className={`flex flex-col items-center gap-1 hover:-translate-y-1 active:scale-90 transition-all ${
@@ -119,7 +114,6 @@ const Navbar = () => {
           </span>
         </Link>
 
-        {/* Menu Utama: Authors */}
         <Link
           href="/penulis"
           className={`flex flex-col items-center gap-1 hover:-translate-y-1 active:scale-90 transition-all ${
@@ -137,7 +131,6 @@ const Navbar = () => {
           </span>
         </Link>
 
-        {/* Menu Utama: Genres */}
         <Link
           href="/kategori"
           className={`flex flex-col items-center gap-1 hover:-translate-y-1 active:scale-90 transition-all ${
