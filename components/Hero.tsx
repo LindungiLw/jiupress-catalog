@@ -88,7 +88,7 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim())
-      window.location.href = `/katalog?q=${encodeURIComponent(query)}`;
+      window.location.href = `/catalog?q=${encodeURIComponent(query)}`;
   };
 
   // LOGIKA AUTO-SWIPE (Setiap 2 detik)
@@ -746,7 +746,7 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
             type="button"
             onClick={() => {
               setQuery(cat.name);
-              window.location.href = `/katalog?category=${encodeURIComponent(cat.name)}`;
+              window.location.href = `/catalog?category=${encodeURIComponent(cat.name)}`;
             }}
             className="flex items-center gap-2 rounded-full bg-white/90 backdrop-blur-md border border-white/50 px-6 py-2.5 text-[14px] font-bold text-[#1e2d6b]/90 transition-all hover:bg-[#1e2d6b] hover:text-white hover:border-[#1e2d6b] hover:scale-105 active:scale-95 shadow-[0_4px_12px_rgba(0,0,0,0.05)] animate-in fade-in slide-in-from-right-4 duration-500"
           >

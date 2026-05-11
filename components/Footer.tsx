@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { ExternalLink, MapPin, Phone, Mail } from "lucide-react"; // <-- ShieldCheck dihapus
+import { ExternalLink, MapPin, Phone, Mail } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -91,6 +91,16 @@ const Footer = () => {
                   JIU Website
                 </a>
               </li>
+              {/* Tambahan Menu Baru: Library Website */}
+              <li>
+                <a
+                  href="https://jiulibrary.ac"
+                  target="_blank"
+                  className="text-white/70 text-[0.95rem] hover:text-[#FFD32B] hover:translate-x-1 transition-all inline-block"
+                >
+                  Library Website
+                </a>
+              </li>
               <li>
                 <a
                   href="https://uijakarta.perpustakaan.co.id/home.ks"
@@ -133,7 +143,6 @@ const Footer = () => {
                 target="_blank"
                 className="w-10 h-10 flex items-center justify-center bg-white/5 border border-white/10 rounded-full text-white hover:bg-[#FFD32B] hover:text-[#1e2d6b] hover:-translate-y-1 transition-all duration-300"
               >
-                {/* <-- SVG mentah pengganti icon Instagram --> */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width="18"
@@ -154,13 +163,12 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* ── FOOTER BOTTOM ── */}
-        <div className="pt-6 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-white/60 text-[0.85rem]">
+        {/* ── FOOTER BOTTOM (Copyright Centered) ── */}
+        <div className="pt-6 border-t border-white/10 flex justify-center items-center text-center text-white/60 text-[0.85rem]">
           <p>
             &copy; 2026 Dream Blue Library, JIU.{" "}
             <span>All rights reserved.</span>
           </p>
-          {/* Bagian link Staff Login sudah dihapus dari sini */}
         </div>
       </div>
     </footer>

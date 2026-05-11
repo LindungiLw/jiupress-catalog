@@ -1,76 +1,78 @@
 "use client";
 
 import React from "react";
+import Link from "next/link"; // Tambahkan Link untuk bisa di-klik ke halaman detail
 
 interface BookProps {
   books: any[];
 }
 
 const PopularBooks = ({ books }: BookProps) => {
-  // Kita ambil 4-6 buku saja untuk bagian populer
+  // Ambil 6 buku teratas
   const topBooks = books.slice(0, 6);
 
   return (
-    // Padding atas dan bawah 0 (pt-0 pb-0)
-    <section className="w-full bg-white px-[5%] pt-0 pb-0 font-[Poppins,sans-serif]">
+    <section className="w-full bg-[#f8fafc] px-[5%] pt-0 pb-20 font-[Poppins,sans-serif]">
       <div className="mx-auto max-w-7xl">
         {/* ── Header: Judul di Tengah ── */}
         <div className="text-center mb-10">
           <h3 className="text-3xl md:text-4xl font-black text-[#1e2d6b] tracking-tight">
-            Buku yang Populer
+            Popular Books
           </h3>
           <div className="w-12 h-1.5 bg-[#FFD32B] mx-auto mt-3 rounded-full"></div>
         </div>
 
-        {/* ── Grid: UI Disamakan dengan gaya BookClient ── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-20">
+        {/* ── Grid: Diadaptasi dari gaya NewBooks ── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 pb-12">
           {topBooks.map((book) => (
+            // ── Kartu Minimalis ──
             <div
               key={book.id}
-              className="group flex items-center bg-white rounded-[18px] p-4 border border-gray-100 shadow-[0_4px_20px_rgb(0,0,0,0.02)] hover:shadow-[0_15px_30px_rgb(30,45,107,0.08)] transition-all duration-300 hover:-translate-y-1 cursor-pointer"
+              className="bg-white rounded-[24px] p-3 shadow-[0_8px_30px_rgb(0,0,0,0.03)] hover:shadow-[0_20px_40px_rgb(0,0,0,0.08)] transition-all duration-300 border border-gray-100 group flex flex-col h-full hover:-translate-y-1"
             >
-              {/* Gambar Buku (Sesuai gaya BookClient) */}
-              <div className="w-[70px] h-[95px] min-w-[70px] bg-gray-50 rounded-lg overflow-hidden border border-gray-100 shadow-sm">
+              {/* ── Area Gambar (Klik mengarah ke Halaman Detail) ── */}
+              <Link
+                href={`/catalog/${book.id}`}
+                className="w-full aspect-[4/5] rounded-[18px] overflow-hidden mb-4 bg-gray-50 relative cursor-pointer block group/img"
+              >
                 <img
-                  src={book.image}
+                  src={book.image || "/assets/placeholder-book.png"}
                   alt={book.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-700"
                 />
-              </div>
 
-              {/* Informasi Buku (Sesuai gaya BookClient) */}
-              <div className="ml-4 flex flex-col justify-center overflow-hidden">
-                {/* Kategori Badge */}
-                <div className="mb-1.5">
-                  <span className="bg-gray-100 text-gray-500 text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
-                    {book.category || "Umum"}
-                  </span>
+                {/* Badge Harga (Kanan Atas) */}
+                <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-md px-2.5 py-1.5 rounded-full text-[11px] font-black text-[#1e2d6b] shadow-sm z-10">
+                  Rp {new Intl.NumberFormat("id-ID").format(book.price)}
                 </div>
+              </Link>
 
-                {/* Judul Buku */}
-                <h4 className="text-[15px] font-bold text-[#1e2d6b] leading-tight mb-1 line-clamp-2 group-hover:text-blue-600 transition-colors">
-                  {book.title}
-                </h4>
-
-                {/* Penulis */}
-                <p className="text-gray-400 text-[11px] font-medium mb-2">
+              {/* ── Area Teks (Minimalis) ── */}
+              <div className="px-2 pb-2 text-center flex flex-col justify-center flex-grow">
+                <p className="text-[#FFD32B] text-[10px] font-bold uppercase tracking-widest mb-1 line-clamp-1">
                   {book.author}
                 </p>
-
-                {/* Harga */}
-                <p className="text-[13px] font-black text-emerald-600">
-                  Rp {new Intl.NumberFormat("id-ID").format(book.price)}
-                </p>
+                <Link
+                  href={`/catalog/${book.id}`}
+                  className="hover:text-blue-600 transition-colors"
+                >
+                  <h4 className="text-lg font-black text-[#1e2d6b] leading-snug line-clamp-2">
+                    {book.title}
+                  </h4>
+                </Link>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Tombol Lihat Semua jika perlu */}
-        <div className="flex justify-center pb-20">
-          <button className="px-6 py-2.5 rounded-xl border border-gray-200 text-[#1e2d6b] font-bold text-xs transition-all hover:bg-[#1e2d6b] hover:text-white active:scale-95 shadow-sm">
-            Lihat Semua Koleksi
-          </button>
+        {/* Tombol Lihat Semua (Opsional, akan menuju halaman /catalog biasa) */}
+        <div className="flex justify-center">
+          <Link
+            href="/catalog"
+            className="px-8 py-3.5 rounded-full bg-white border border-[#1e2d6b]/10 text-[#1e2d6b] font-bold text-sm transition-all hover:bg-[#1e2d6b] hover:text-white hover:border-[#1e2d6b] active:scale-95 shadow-sm hover:shadow-lg"
+          >
+            Explore All Books
+          </Link>
         </div>
       </div>
     </section>

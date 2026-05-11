@@ -33,13 +33,13 @@ const Navbar = () => {
             : "py-5 bg-transparent"
         }`}
       >
-        {/* Kiri: Logo JIU & Teks Press */}
+        {/* Kiri: Logo Typografi JIU Press */}
         <Link
           href="/"
-          className="flex items-center gap-2 group active:scale-95 transition-transform"
+          className="flex items-center group active:scale-95 transition-transform"
         >
-          {/* Logo Gambar JIU */}
-          <div className="w-9 h-9 relative rounded-full overflow-hidden flex items-center justify-center bg-white/10 backdrop-blur-sm group-hover:scale-105 transition-transform">
+          {/* LOGO GAMBAR SEMENTARA DI-COMMENT 
+          <div className="w-9 h-9 relative rounded-full overflow-hidden flex items-center justify-center bg-white/10 backdrop-blur-sm group-hover:scale-105 transition-transform mr-2">
             <img
               src="/assets/jiu-library.png"
               alt="JIU Logo"
@@ -52,11 +52,19 @@ const Navbar = () => {
               }}
             />
           </div>
+          */}
 
-          {/* Teks Press (Warna Putih) */}
-          <span className="font-bold text-xl text-white tracking-tight drop-shadow-sm">
-            Press
-          </span>
+          {/* Logo Teks Baru (Tipografi Estetik) */}
+          <div className="flex items-baseline group-hover:scale-105 transition-transform duration-300 origin-left">
+            <span className="font-black text-2xl text-[#FFD32B] tracking-tighter drop-shadow-md">
+              JIU
+            </span>
+            <span className="font-semibold text-2xl text-white tracking-tight drop-shadow-sm ml-1">
+              Press
+            </span>
+            {/* Titik pemanis opsional (Bisa dihapus kalau kurang suka) */}
+            <span className="w-1.5 h-1.5 bg-[#FFD32B] rounded-full ml-1 mb-1 shadow-[0_0_8px_#FFD32B]"></span>
+          </div>
         </Link>
 
         {/* Kanan: Link Tambahan */}
@@ -92,7 +100,6 @@ const Navbar = () => {
       </header>
 
       {/* ─── 2. BOTTOM NAVIGATION BAR (HANYA MUNCUL DI MOBILE / LAYAR KECIL) ─── */}
-      {/* Aku tambahkan md:hidden di sini! */}
       <nav className="md:hidden fixed bottom-0 left-0 w-full bg-[#1e2d6b] border-t border-white/10 shadow-[0_-8px_30px_rgba(0,0,0,0.2)] z-50 px-6 py-3 flex items-center justify-between pb-safe">
         {/* Tombol Search */}
         <button
