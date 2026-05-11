@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Search, BookOpen, Users, Tags, Globe } from "lucide-react";
+import { Search, BookOpen, Users, Tags } from "lucide-react"; // <-- Globe sudah dihapus
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -27,7 +27,9 @@ const Navbar = () => {
     <>
       {/* ─── 1. TOP HEADER ─── */}
       <header
-        className={`fixed top-0 left-0 z-50 w-full px-6 transition-all duration-300 flex items-center justify-between ${
+        className={`fixed top-0 left-0 z-50 w-full transition-all duration-300 flex items-center justify-between 
+        px-6 md:px-12 lg:px-16 xl:px-24 
+        ${
           isScrolled
             ? "py-3 bg-[#1e2d6b]/95 backdrop-blur-md shadow-lg border-b border-white/10"
             : "py-5 bg-transparent"
@@ -38,22 +40,6 @@ const Navbar = () => {
           href="/"
           className="flex items-center group active:scale-95 transition-transform"
         >
-          {/* LOGO GAMBAR SEMENTARA DI-COMMENT 
-          <div className="w-9 h-9 relative rounded-full overflow-hidden flex items-center justify-center bg-white/10 backdrop-blur-sm group-hover:scale-105 transition-transform mr-2">
-            <img
-              src="/assets/jiu-library.png"
-              alt="JIU Logo"
-              className="w-full h-full object-contain"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = "none";
-                target.parentElement!.innerHTML =
-                  '<div class="bg-white text-[#1e2d6b] font-black text-xl w-full h-full flex items-center justify-center rounded-full">J</div>';
-              }}
-            />
-          </div>
-          */}
-
           {/* Logo Teks Baru (Tipografi Estetik) */}
           <div className="flex items-baseline group-hover:scale-105 transition-transform duration-300 origin-left">
             <span className="font-black text-2xl text-[#FFD32B] tracking-tighter drop-shadow-md">
@@ -62,15 +48,14 @@ const Navbar = () => {
             <span className="font-semibold text-2xl text-white tracking-tight drop-shadow-sm ml-1">
               Press
             </span>
-            {/* Titik pemanis opsional (Bisa dihapus kalau kurang suka) */}
             <span className="w-1.5 h-1.5 bg-[#FFD32B] rounded-full ml-1 mb-1 shadow-[0_0_8px_#FFD32B]"></span>
           </div>
         </Link>
 
         {/* Kanan: Link Tambahan */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center">
           {/* Link Desktop */}
-          <div className="hidden md:flex items-center gap-8 text-sm font-bold text-white/80">
+          <div className="hidden md:flex items-center gap-8 lg:gap-12 text-sm font-bold text-white/90">
             <Link
               href="/services"
               className="hover:text-[#FFD32B] hover:-translate-y-0.5 transition-all drop-shadow-sm"
@@ -90,12 +75,7 @@ const Navbar = () => {
               Bantuan?
             </Link>
           </div>
-
-          {/* Ganti Bahasa */}
-          <button className="hidden md:flex items-center gap-1.5 text-white/80 hover:text-[#FFD32B] hover:scale-105 active:scale-95 transition-all drop-shadow-sm">
-            <Globe size={18} />
-            <span className="text-sm font-bold">ID</span>
-          </button>
+          {/* Tombol Ganti Bahasa sudah dihapus dari sini */}
         </div>
       </header>
 

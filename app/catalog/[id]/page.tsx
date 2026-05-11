@@ -23,6 +23,12 @@ export default async function BookDetailPage({
 
   if (isNaN(bookId)) return notFound();
 
+  // Tambah views setiap kali halaman dibuka
+  await prisma.book.update({
+    where: { id: bookId },
+    data: { views: { increment: 1 } },
+  });
+
   const book = await prisma.book.findUnique({
     where: { id: bookId },
     include: { category: true },
@@ -41,7 +47,6 @@ export default async function BookDetailPage({
   return (
     <main className="min-h-screen bg-[#f8fafc] font-[Poppins,sans-serif] flex flex-col">
       <Navbar />
-
       <div className="max-w-7xl mx-auto px-5 md:px-8 w-full pt-32 pb-24 grow">
         {/* Breadcrumb */}
         <Link
@@ -202,7 +207,7 @@ export default async function BookDetailPage({
                     )}
                   </a>
 
-                  {/* Tombol WhatsApp (Tetap/Statis) */}
+                  {/* Tombol WhatsApp */}
                   <a
                     href="https://wa.me/6281260173697"
                     target="_blank"
@@ -227,9 +232,10 @@ export default async function BookDetailPage({
             </div>
           </div>
         </div>
-
-        <Footer />
-      </div>
+      </div>{" "}
+      {/* <-- INI ADALAH PENUTUP DARI max-w-7xl, KITA PINDAHKAN FOOTER KE BAWAH INI */}
+      {/* SEKARANG FOOTER BERADA DI LUAR PEMBUNGKUS, SEHINGGA BISA FULL WIDTH */}
+      <Footer />
     </main>
   );
 }
