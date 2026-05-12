@@ -22,17 +22,22 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // KUNCI PERBAIKAN: Cek apakah user sedang di Beranda atau bukan
+  const isHomePage = pathname === "/";
+  // Navbar jadi solid (biru) jika di-scroll ATAU jika BUKAN di halaman beranda
+  const isSolid = isScrolled || !isHomePage;
+
   return (
     <>
       {/* ─── 1. TOP HEADER ─── */}
       <header
         className={`fixed top-0 left-0 z-50 w-full transition-all duration-300 ${
-          isScrolled
+          isSolid
             ? "py-3 bg-[#1e2d6b]/95 backdrop-blur-md shadow-lg border-b border-white/10"
             : "py-5 bg-transparent"
         }`}
       >
-        {/* KUNCI: Wrapper max-w-7xl agar sejajar dengan konten utama di bawahnya */}
+        {/* Wrapper max-w-7xl agar sejajar dengan konten utama di bawahnya */}
         <div className="mx-auto w-full max-w-7xl px-5 md:px-8 flex items-center justify-between">
           {/* Kiri: Logo Typografi JIU Press */}
           <Link

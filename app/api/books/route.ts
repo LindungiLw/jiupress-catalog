@@ -30,6 +30,7 @@ export async function POST(req: Request) {
       price,
       discountPrice,
       image,
+      shopeeLink, // <-- INI DITAMBAHKAN
       description,
       publishedDate,
       releaseAt,
@@ -45,6 +46,7 @@ export async function POST(req: Request) {
         price: Number(price),
         discountPrice: discountPrice ? Number(discountPrice) : null,
         image: image || null,
+        shopeeLink: shopeeLink || null, // <-- INI DITAMBAHKAN KE DATABASE
         description: description || null,
         publishedDate: publishedDate ? new Date(publishedDate) : null,
         releaseAt: releaseAt ? new Date(releaseAt) : new Date(),
@@ -74,6 +76,7 @@ export async function PUT(req: Request) {
       price,
       discountPrice,
       image,
+      shopeeLink, // <-- INI DITAMBAHKAN
       description,
       publishedDate,
       releaseAt,
@@ -96,6 +99,7 @@ export async function PUT(req: Request) {
         price: Number(price),
         discountPrice: discountPrice ? Number(discountPrice) : null,
         image: image || null,
+        shopeeLink: shopeeLink || null, // <-- INI DITAMBAHKAN KE DATABASE
         description: description || null,
         publishedDate: publishedDate ? new Date(publishedDate) : null,
         releaseAt: releaseAt ? new Date(releaseAt) : new Date(),

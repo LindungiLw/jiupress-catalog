@@ -1,3 +1,6 @@
+// TAMBAHKAN INI AGAR HALAMAN SELALU REAL-TIME DAN TIDAK DI-CACHE
+export const dynamic = "force-dynamic";
+
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -60,11 +63,8 @@ export default async function BookDetailPage({
         {/* SATU KANVAS PUTIH UTAMA */}
         <div className="bg-white rounded-[2rem] p-6 md:p-10 lg:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
-            {/* =========================================
-                KOLOM KIRI (JATAH 8 KOLOM): TEKS & SINOPSIS 
-                ========================================= */}
+            {/* KOLOM KIRI (TEKS & SINOPSIS) */}
             <div className="lg:col-span-8 flex flex-col text-left order-2 lg:order-1">
-              {/* Header */}
               <div className="mb-8">
                 <span className="inline-block px-4 py-1.5 bg-blue-50 text-blue-600 rounded-full text-xs font-bold uppercase tracking-widest mb-4 border border-blue-100">
                   {book.category?.name || "Kategori Umum"}
@@ -79,7 +79,6 @@ export default async function BookDetailPage({
                 )}
               </div>
 
-              {/* Meta Data */}
               <div className="flex flex-wrap items-center gap-x-10 gap-y-6 py-6 border-y border-slate-100 mb-8">
                 <div>
                   <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider mb-1.5">
@@ -114,7 +113,6 @@ export default async function BookDetailPage({
                 </div>
               </div>
 
-              {/* Sinopsis */}
               <div>
                 <h3 className="text-lg font-black text-slate-900 flex items-center gap-2 mb-4">
                   <BookOpen size={20} className="text-blue-600" /> Sinopsis /
@@ -127,11 +125,8 @@ export default async function BookDetailPage({
               </div>
             </div>
 
-            {/* =========================================
-                KOLOM KANAN (JATAH 4 KOLOM): GAMBAR & KARTU 
-                ========================================= */}
+            {/* KOLOM KANAN (GAMBAR & KARTU) */}
             <div className="lg:col-span-4 flex flex-col items-center w-full order-1 lg:order-2 lg:sticky lg:top-32">
-              {/* GAMBAR BUKU */}
               <div className="w-full max-w-[260px] aspect-[3/4] rounded-[1.5rem] overflow-hidden shadow-lg border border-slate-100 bg-slate-50 mb-8">
                 <img
                   src={
@@ -143,9 +138,7 @@ export default async function BookDetailPage({
                 />
               </div>
 
-              {/* KARTU PEMBAYARAN ESTETIK */}
               <div className="w-full border border-slate-200 rounded-[1.5rem] overflow-hidden shadow-[0_8px_30px_rgb(0,0,0,0.04)] bg-white">
-                {/* Box Harga */}
                 <div className="p-6 bg-slate-50/50 border-b border-slate-100 text-center">
                   <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1.5">
                     Harga Resmi
@@ -166,13 +159,12 @@ export default async function BookDetailPage({
                   )}
                 </div>
 
-                {/* Box Pilihan Platform */}
                 <div className="p-5 flex flex-col gap-3">
                   <p className="text-sm font-bold text-slate-800 mb-1 px-1">
                     Pilih Metode Pembelian:
                   </p>
 
-                  {/* Tombol Shopee (Dinamis dari Database) */}
+                  {/* Tombol Shopee */}
                   <a
                     href={book.shopeeLink || "#"}
                     target={book.shopeeLink ? "_blank" : "_self"}
@@ -232,9 +224,7 @@ export default async function BookDetailPage({
             </div>
           </div>
         </div>
-      </div>{" "}
-      {/* <-- INI ADALAH PENUTUP DARI max-w-7xl, KITA PINDAHKAN FOOTER KE BAWAH INI */}
-      {/* SEKARANG FOOTER BERADA DI LUAR PEMBUNGKUS, SEHINGGA BISA FULL WIDTH */}
+      </div>
       <Footer />
     </main>
   );

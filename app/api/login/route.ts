@@ -1,45 +1,59 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs"; // Alat pengacak yang baru kita install
+import bcrypt from "bcryptjs";
+import { SignJWT } from "jose";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const { username, password } = body;
 
-    // 1. Cari username di database
     const admin = await prisma.admin.findUnique({
       where: { username: username },
     });
 
-    // 2. Kalau usernamenya nggak ketemu
+    // Keamanan 1: Anti-Enumeration (Pesan error harus sama agar hacker bingung)
     if (!admin) {
       return NextResponse.json(
-        { error: "Username tidak ditemukan!" },
+        { error: "Username atau Password salah!" },
         { status: 401 },
       );
     }
 
-    // 3. Bandingkan password yang diketik dengan password acak di database
     const isPasswordMatch = await bcrypt.compare(password, admin.password);
 
-    // 4. Kalau passwordnya nggak cocok
     if (!isPasswordMatch) {
-      return NextResponse.json({ error: "Password salah!" }, { status: 401 });
+      return NextResponse.json(
+        { error: "Username atau Password salah!" },
+        { status: 401 },
+      );
     }
 
-    // --- Kalau Cocok, Berikan "Kartu ID" (Cookie) ---
+    // Keamanan 2: Buat Token JWT yang di-Tandatangani Kriptografi
+    const secret = new TextEncoder().encode(
+      process.env.JWT_SECRET || "fallback_secret",
+    );
+    const token = await new SignJWT({
+      username: admin.username,
+      role: "superadmin",
+    })
+      .setProtectedHeader({ alg: "HS256" })
+      .setIssuedAt()
+      .setExpirationTime("8h") // Expired dalam 8 jam
+      .sign(secret);
+
     const response = NextResponse.json(
       { message: "Login Berhasil!" },
       { status: 200 },
     );
 
-    // UPDATE: maxAge dihapus. Sekarang ini adalah Session Cookie!
-    // Kalau browser ditutup, token ini akan otomatis hancur.
-    response.cookies.set("admin_token", "logged_in", {
+    // Keamanan 3: Set Cookie dengan HttpOnly & Strict (Mencegah XSS & CSRF)
+    response.cookies.set("admin_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
       path: "/",
+      maxAge: 60 * 60 * 8, // 8 jam
     });
 
     return response;
