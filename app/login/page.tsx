@@ -2,18 +2,23 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+// 1. IMPORT PUSAT BAHASA
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function AdminLogin() {
+  // 2. PANGGIL FUNGSI TERJEMAHAN DAN STATUS BAHASA
+  const { t, language } = useLanguage();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
-  const [isLoading, setIsLoading] = useState(false); // State baru untuk animasi loading
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg("");
-    setIsLoading(true); // Mulai animasi loading saat tombol diklik
+    setIsLoading(true);
 
     try {
       const response = await fetch("/api/login", {
@@ -23,17 +28,34 @@ export default function AdminLogin() {
       });
 
       if (response.ok) {
-        // Biarkan isLoading tetap true agar tombol tidak berkedip kembali ke tulisan "Masuk"
-        // saat Next.js sedang proses pindah halaman
         router.push("/admin");
       } else {
         const data = await response.json();
-        setErrorMsg(data.error);
-        setIsLoading(false); // Matikan loading jika gagal
+
+        // ─── 3. LOGIKA PENERJEMAH KODE ERROR CANGGIH ───
+        if (data.error === "RATE_LIMIT_EXCEEDED") {
+          // Gabungkan teks terjemahan dengan data menit dari server
+          setErrorMsg(
+            `${t("RATE_LIMIT_EXCEEDED")} ${data.minutes} ${language === "EN" ? "minutes." : "menit."}`,
+          );
+        } else if (
+          data.error === "INVALID_CREDENTIALS" ||
+          data.error === "SERVER_ERROR"
+        ) {
+          // Terjemahkan langsung pakai kamus
+          // Gunakan 'as any' agar TypeScript tidak protes karena kuncinya berasal dari variabel
+          setErrorMsg(t(data.error as any));
+        } else {
+          // Fallback jika ada error aneh yang tidak dikenali
+          setErrorMsg(data.error || t("SERVER_ERROR" as any));
+        }
+
+        setIsLoading(false);
       }
     } catch (error) {
-      setErrorMsg("Terjadi kesalahan pada server. Silakan coba lagi.");
-      setIsLoading(false); // Matikan loading jika error jaringan
+      // Tangkap error jaringan (misal server mati)
+      setErrorMsg(t("SERVER_ERROR" as any));
+      setIsLoading(false);
     }
   };
 
@@ -46,7 +68,8 @@ export default function AdminLogin() {
             Admin Panel
           </h1>
           <p className="text-slate-500 mt-2 text-sm">
-            Silakan login untuk mengelola katalog JIU Press
+            {/* 4. TERAPKAN TERJEMAHAN DI DESKRIPSI */}
+            {t("adminPanelDesc")}
           </p>
         </div>
 
@@ -86,7 +109,8 @@ export default function AdminLogin() {
               onChange={(e) => setUsername(e.target.value)}
               disabled={isLoading}
               className="w-full px-4 py-3 rounded-lg border border-slate-200 bg-slate-50 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-              placeholder="Masukkan username admin"
+              // 5. TERAPKAN TERJEMAHAN DI PLACEHOLDER
+              placeholder={t("usernamePlaceholder")}
               required
             />
           </div>
@@ -137,10 +161,12 @@ export default function AdminLogin() {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   ></path>
                 </svg>
-                Memverifikasi...
+                {/* 6. TERAPKAN TERJEMAHAN SAAT LOADING */}
+                {t("verifying")}
               </>
             ) : (
-              "Masuk ke Dashboard"
+              // 7. TERAPKAN TERJEMAHAN DI TOMBOL
+              t("loginToDashboard")
             )}
           </button>
         </form>

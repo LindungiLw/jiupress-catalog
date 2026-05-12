@@ -4,6 +4,8 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LayoutDashboard, BookOpen, Tags, LogOut } from "lucide-react";
+// 1. IMPORT PUSAT BAHASA
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function AdminLayout({
   children,
@@ -11,16 +13,23 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  // 2. PANGGIL FUNGSI TERJEMAHAN
+  const { t } = useLanguage();
 
+  // 3. DAFTAR MENU DIPINDAHKAN KE SINI AGAR BISA BACA TERJEMAHAN
   const menuItems = [
-    { name: "Dashboard", href: "/admin", icon: <LayoutDashboard size={20} /> },
     {
-      name: "Product Catalog",
+      name: t("menuDashboard"),
+      href: "/admin",
+      icon: <LayoutDashboard size={20} />,
+    },
+    {
+      name: t("menuCatalog"),
       href: "/admin/books",
       icon: <BookOpen size={20} />,
     },
     {
-      name: "Categories",
+      name: t("menuCategories"),
       href: "/admin/books/categories",
       icon: <Tags size={20} />,
     },
@@ -28,7 +37,7 @@ export default function AdminLayout({
 
   return (
     <div className="flex h-screen w-full bg-slate-50 font-[Plus_Jakarta_Sans,sans-serif] overflow-hidden text-slate-800">
-      {/* SIDEBAR - Menggunakan tema terang dengan border halus */}
+      {/* SIDEBAR */}
       <aside className="w-64 bg-white border-r border-slate-200 flex flex-col justify-between hidden md:flex z-20">
         <div>
           {/* Logo Area */}
@@ -40,13 +49,12 @@ export default function AdminLayout({
 
           {/* Menu Items */}
           <nav className="mt-6 px-4 flex flex-col gap-2">
-            {/* Label Kategori Menu (Opsional, agar terlihat rapi) */}
             <p className="px-3 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">
-              Menu Utama
+              {/* 4. TERJEMAHAN MENU UTAMA */}
+              {t("mainMenu")}
             </p>
 
             {menuItems.map((item) => {
-              // Logika active state yang lebih presisi
               const isActive =
                 item.href === "/admin"
                   ? pathname === "/admin"
@@ -87,17 +95,19 @@ export default function AdminLayout({
               size={20}
               className="text-slate-400 group-hover:text-red-500 transition-colors"
             />
-            Logout
+            {/* 5. TERJEMAHAN LOGOUT */}
+            {t("logout")}
           </button>
         </div>
       </aside>
 
       {/* MAIN CONTENT AREA */}
       <main className="flex-1 flex flex-col h-full overflow-y-auto relative">
-        {/* HEADER - Efek Glassmorphism */}
+        {/* HEADER */}
         <header className="h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 flex items-center justify-between px-8 z-10 sticky top-0">
           <h2 className="text-lg font-bold text-slate-800 tracking-tight">
-            Admin Panel
+            {/* 6. TERJEMAHAN ADMIN PANEL */}
+            {t("adminPanel")}
           </h2>
 
           <div className="flex items-center gap-4">
@@ -107,10 +117,10 @@ export default function AdminLayout({
                   Admin
                 </p>
                 <p className="text-[11px] text-slate-400 font-medium mt-1">
-                  Manager
+                  {/* 7. TERJEMAHAN ROLE */}
+                  {t("managerRole")}
                 </p>
               </div>
-              {/* Avatar dengan Gradient */}
               <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-600 to-blue-400 flex items-center justify-center text-white font-bold text-sm shadow-md border-2 border-white ring-2 ring-slate-100">
                 A
               </div>

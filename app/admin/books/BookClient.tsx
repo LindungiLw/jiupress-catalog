@@ -13,6 +13,8 @@ import {
   Link as LinkIcon,
   ShoppingBag,
 } from "lucide-react";
+// 1. IMPORT PUSAT BAHASA
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function BookClient({
   books: initialBooks,
@@ -21,6 +23,9 @@ export default function BookClient({
   books: any[];
   categories: any[];
 }) {
+  // 2. PANGGIL FUNGSI TERJEMAHAN
+  const { t } = useLanguage();
+
   const [bookList, setBookList] = useState(initialBooks);
   const [activeTab, setActiveTab] = useState("Semua");
   const [searchQuery, setSearchQuery] = useState("");
@@ -49,7 +54,11 @@ export default function BookClient({
 
   const filteredBooks = bookList.filter((book) => {
     const categoryName = book.category?.name || "Tanpa Kategori";
-    const matchCategory = activeTab === "Semua" || categoryName === activeTab;
+    // Gunakan pengecekan "Semua" atau "All" tergantung bahasanya agar tab tetap berfungsi
+    const matchCategory =
+      activeTab === "Semua" ||
+      activeTab === "All" ||
+      categoryName === activeTab;
     const matchSearch =
       book.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       book.author.toLowerCase().includes(searchQuery.toLowerCase());
@@ -127,7 +136,7 @@ export default function BookClient({
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) throw new Error("Gagal menyimpan buku");
+      if (!res.ok) throw new Error("API Error");
       const savedBook = await res.json();
 
       if (editingId) {
@@ -137,22 +146,25 @@ export default function BookClient({
       }
       setIsModalOpen(false);
     } catch (error) {
-      alert("Terjadi kesalahan saat menyimpan data.");
+      alert(t("alertErrorSave"));
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Yakin ingin menghapus buku ini dari katalog?")) return;
+    if (!confirm(t("confirmDelete"))) return;
     try {
       const res = await fetch(`/api/books?id=${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Gagal menghapus");
+      if (!res.ok) throw new Error("API Error");
       setBookList(bookList.filter((b) => b.id !== id));
     } catch (error) {
-      alert("Terjadi kesalahan saat menghapus buku.");
+      alert(t("alertErrorDelete"));
     }
   };
+
+  // Label "Semua" dinamis tergantung bahasa
+  const allTabLabel = t("allTab");
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -160,11 +172,9 @@ export default function BookClient({
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm gap-4">
         <div>
           <h3 className="text-xl font-bold text-slate-800 tracking-tight">
-            Katalog Produk
+            {t("productCatalog")}
           </h3>
-          <p className="text-slate-500 text-sm mt-1">
-            Kelola daftar buku yang tampil di halaman utama.
-          </p>
+          <p className="text-slate-500 text-sm mt-1">{t("manageBooksDesc")}</p>
         </div>
         <div className="flex flex-col sm:flex-row w-full md:w-auto gap-3">
           <div className="relative w-full sm:w-64">
@@ -174,7 +184,7 @@ export default function BookClient({
             />
             <input
               type="text"
-              placeholder="Cari judul / penulis..."
+              placeholder={t("searchBookPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-9 pr-4 text-sm outline-none focus:bg-white focus:border-blue-500 focus:ring-2 transition-all"
@@ -182,9 +192,9 @@ export default function BookClient({
           </div>
           <button
             onClick={handleOpenAdd}
-            className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-blue-700 active:scale-95 transition-all shadow-sm"
+            className="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-blue-700 active:scale-95 transition-all shadow-sm whitespace-nowrap"
           >
-            <Plus size={18} /> Tambah Buku
+            <Plus size={18} /> {t("addBook")}
           </button>
         </div>
       </div>
@@ -196,16 +206,24 @@ export default function BookClient({
       >
         <div className="flex gap-2 whitespace-nowrap">
           <button
-            onClick={() => setActiveTab("Semua")}
-            className={`px-5 py-2 rounded-xl text-sm font-semibold border transition-all ${activeTab === "Semua" ? "bg-slate-800 text-white border-slate-800 shadow-md" : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50"}`}
+            onClick={() => setActiveTab(allTabLabel)}
+            className={`px-5 py-2 rounded-xl text-sm font-semibold border transition-all ${
+              activeTab === "Semua" || activeTab === "All"
+                ? "bg-slate-800 text-white border-slate-800 shadow-md"
+                : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50"
+            }`}
           >
-            Semua
+            {allTabLabel}
           </button>
           {categories.map((cat) => (
             <button
               key={cat.id}
               onClick={() => setActiveTab(cat.name)}
-              className={`px-5 py-2 rounded-xl text-sm font-semibold border transition-all ${activeTab === cat.name ? "bg-slate-800 text-white border-slate-800 shadow-md" : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50"}`}
+              className={`px-5 py-2 rounded-xl text-sm font-semibold border transition-all ${
+                activeTab === cat.name
+                  ? "bg-slate-800 text-white border-slate-800 shadow-md"
+                  : "bg-white text-slate-500 border-slate-200 hover:bg-slate-50"
+              }`}
             >
               {cat.name}
             </button>
@@ -218,11 +236,11 @@ export default function BookClient({
         <div className="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex items-center gap-2">
           <LayoutGrid size={16} className="text-blue-600" />
           <p className="text-sm font-semibold text-slate-700">
-            Menampilkan{" "}
+            {t("showing")}{" "}
             <span className="text-blue-600 font-bold">
               {filteredBooks.length}
             </span>{" "}
-            produk
+            {t("products")}
           </p>
         </div>
 
@@ -231,16 +249,16 @@ export default function BookClient({
             <thead>
               <tr className="border-b border-slate-200 bg-white">
                 <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                  Judul & Penulis
+                  {t("colTitleAuthor")}
                 </th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                  Kategori
+                  {t("colCategory")}
                 </th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                  Harga
+                  {t("colPrice")}
                 </th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-right">
-                  Aksi
+                  {t("colAction")}
                 </th>
               </tr>
             </thead>
@@ -293,14 +311,12 @@ export default function BookClient({
                       <button
                         onClick={() => handleOpenEdit(book)}
                         className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl"
-                        title="Edit Buku"
                       >
                         <Edit size={16} />
                       </button>
                       <button
                         onClick={() => handleDelete(book.id)}
                         className="p-2.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl"
-                        title="Hapus Buku"
                       >
                         <Trash2 size={16} />
                       </button>
@@ -312,7 +328,7 @@ export default function BookClient({
           </table>
           {filteredBooks.length === 0 && (
             <div className="p-12 text-center text-slate-500 text-sm font-medium">
-              Tidak ada data buku yang sesuai.
+              {t("noDataBook")}
             </div>
           )}
         </div>
@@ -328,12 +344,10 @@ export default function BookClient({
             <div className="sticky top-0 bg-white/90 backdrop-blur-md border-b border-slate-100 px-8 py-5 flex items-center justify-between z-20">
               <div>
                 <h3 className="text-xl font-bold text-slate-800">
-                  {editingId ? "Edit Data Buku" : "Tambah Buku Baru"}
+                  {editingId ? t("editBookTitle") : t("addBookTitle")}
                 </h3>
                 <p className="text-sm text-slate-500 mt-1">
-                  {editingId
-                    ? "Perbarui informasi metadata buku."
-                    : "Lengkapi form untuk menambah katalog."}
+                  {editingId ? t("editBookDesc") : t("addBookDesc")}
                 </p>
               </div>
               <button
@@ -351,7 +365,7 @@ export default function BookClient({
               <div className="space-y-5">
                 <div>
                   <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">
-                    Judul Buku *
+                    {t("formTitleLabel")}
                   </label>
                   <input
                     type="text"
@@ -365,7 +379,7 @@ export default function BookClient({
                 </div>
                 <div>
                   <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">
-                    Sub Judul
+                    {t("formSubtitleLabel")}
                   </label>
                   <input
                     type="text"
@@ -379,7 +393,7 @@ export default function BookClient({
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">
-                      Penulis *
+                      {t("formAuthorLabel")}
                     </label>
                     <input
                       type="text"
@@ -407,7 +421,7 @@ export default function BookClient({
                 </div>
                 <div>
                   <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">
-                    Kategori *
+                    {t("formCategoryLabel")}
                   </label>
                   <select
                     required
@@ -418,7 +432,7 @@ export default function BookClient({
                     className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 text-slate-700"
                   >
                     <option value="" disabled>
-                      -- Pilih Kategori --
+                      {t("selectCategory")}
                     </option>
                     {categories.map((cat) => (
                       <option key={cat.id} value={cat.id}>
@@ -428,7 +442,6 @@ export default function BookClient({
                   </select>
                 </div>
 
-                {/* === INPUT LINK SHOPEE === */}
                 <div>
                   <label className="text-xs font-bold text-orange-600 uppercase mb-2 flex items-center gap-1">
                     <ShoppingBag size={14} /> Link Shopee
@@ -446,7 +459,7 @@ export default function BookClient({
 
                 <div className="bg-white p-4 border border-slate-200 rounded-xl shadow-sm">
                   <label className="text-xs font-bold text-slate-500 uppercase mb-3 block">
-                    Gambar / Cover Buku
+                    {t("formCoverLabel")}
                   </label>
                   <div className="flex gap-4 mb-4">
                     <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer hover:text-blue-600">
@@ -497,7 +510,7 @@ export default function BookClient({
                       />
                       <div className="text-xs text-slate-500">
                         <p className="font-bold text-slate-700 mb-0.5">
-                          Preview Cover
+                          {t("previewCover")}
                         </p>
                         <p className="line-clamp-2 break-all text-[10px]">
                           {formData.image.substring(0, 60)}...
@@ -512,7 +525,7 @@ export default function BookClient({
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">
-                      Harga (Rp) *
+                      {t("formPriceLabel")}
                     </label>
                     <input
                       type="number"
@@ -526,7 +539,7 @@ export default function BookClient({
                   </div>
                   <div>
                     <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">
-                      Harga Diskon
+                      {t("formDiscountLabel")}
                     </label>
                     <input
                       type="number"
@@ -544,7 +557,7 @@ export default function BookClient({
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">
-                      Tgl Rilis Fisik
+                      {t("formPhysicalDateLabel")}
                     </label>
                     <input
                       type="date"
@@ -560,7 +573,7 @@ export default function BookClient({
                   </div>
                   <div>
                     <label className="text-xs font-bold text-emerald-600 uppercase mb-2 block">
-                      Jadwal Tampil Web *
+                      {t("formWebScheduleLabel")}
                     </label>
                     <input
                       type="datetime-local"
@@ -575,7 +588,7 @@ export default function BookClient({
                 </div>
                 <div>
                   <label className="text-xs font-bold text-slate-500 uppercase mb-2 block">
-                    Deskripsi Sinopsis
+                    {t("formSynopsisLabel")}
                   </label>
                   <textarea
                     rows={6}
@@ -594,7 +607,7 @@ export default function BookClient({
                   onClick={() => setIsModalOpen(false)}
                   className="px-6 py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-200 transition-all text-sm"
                 >
-                  Batal
+                  {t("cancelBtn")}
                 </button>
                 <button
                   type="submit"
@@ -602,11 +615,11 @@ export default function BookClient({
                   className="bg-blue-600 text-white px-8 py-3 rounded-xl font-bold text-sm flex items-center gap-2 hover:bg-blue-700 active:scale-95 transition-all shadow-md disabled:opacity-50"
                 >
                   {isLoading ? (
-                    "Menyimpan..."
+                    t("savingBtn")
                   ) : (
                     <>
                       <Save size={18} />{" "}
-                      {editingId ? "Update Data" : "Simpan Buku"}
+                      {editingId ? t("updateBtn") : t("saveBtn")}
                     </>
                   )}
                 </button>

@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Search } from "lucide-react";
+// 1. IMPORT PUSAT BAHASA
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface KF {
   t: number;
@@ -10,7 +12,6 @@ interface KF {
 }
 type Phase = "climb" | "climbR" | "walk";
 
-// INTERFACE DIUPDATE: icon dihapus
 export interface CategoryData {
   id: number;
   name: string;
@@ -70,9 +71,11 @@ function getPhase(e: number): Phase {
 }
 
 const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
+  // 2. PANGGIL FUNGSI TERJEMAHAN
+  const { t } = useLanguage();
+
   const [query, setQuery] = useState("");
 
-  // STATE BARU UNTUK SWIPER KATEGORI
   const [catIndex, setCatIndex] = useState(0);
   const [isHoveringCat, setIsHoveringCat] = useState(false);
 
@@ -91,19 +94,16 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
       window.location.href = `/catalog?q=${encodeURIComponent(query)}`;
   };
 
-  // LOGIKA AUTO-SWIPE (Setiap 2 detik)
   useEffect(() => {
-    // Jika kategori kurang dari 5 atau sedang di-hover, jangan auto-swipe
     if (!categories || categories.length <= 5 || isHoveringCat) return;
 
     const interval = setInterval(() => {
       setCatIndex((prev) => (prev + 1) % categories.length);
-    }, 2000); // 2000ms = 2 detik
+    }, 2000);
 
     return () => clearInterval(interval);
   }, [categories, isHoveringCat]);
 
-  // Ambil maksimal 5 kategori saja untuk ditampilkan
   const visibleCategories =
     categories?.length <= 5
       ? categories
@@ -155,7 +155,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
 
       $<SVGGElement>("fig")?.setAttribute("transform", `translate(${x},${y})`);
 
-      // Shadow
       const shd = $<SVGEllipseElement>("shd");
       if (shd) {
         shd.setAttribute("rx", onBar ? "5" : "9");
@@ -169,7 +168,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
       const atPickup = elapsed >= 7800 && elapsed <= 10000;
       const carrying = elapsed >= 10000 && elapsed <= 15000;
 
-      // ── CLIMBING ──────────────────────────────────────────────────────
       if (phase === "climb" || phase === "climbR") {
         const dir = phase === "climb" ? 1 : -1;
         const prog =
@@ -194,13 +192,10 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
         sl("luarm", 0, -36, -dir * 8, -42 - aS * 5);
         sl("lfarm", -dir * 8, -42 - aS * 5, -dir * 6, -36 - aS * 3);
         sc("lelbow", -dir * 8, -42 - aS * 5);
-
-        // ── WALK — calm, low amplitude ─────────────────────────────────
       } else {
         const amp = moving ? 5 : 0;
         const lift = moving ? 4 : 0;
 
-        // Right leg
         const rFx = 2 + s * amp;
         const rLift = moving ? Math.max(0, s) * lift : 0;
         const rKx = lerp(2, rFx, 0.5) + 1.5;
@@ -209,7 +204,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
         sl("rshin", rKx, rKy, rFx, -rLift);
         sc("rknee", rKx, rKy);
 
-        // Left leg
         const lFx = -2 - s * amp;
         const lLift = moving ? Math.max(0, -s) * lift : 0;
         const lKx = lerp(-2, lFx, 0.5) - 1.5;
@@ -218,14 +212,11 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
         sl("lshin", lKx, lKy, lFx, -lLift);
         sc("lknee", lKx, lKy);
 
-        // Arms — gentle swing only
         const armAmp = moving ? 5 : 0;
         if (carrying) {
-          // Right arm holds book near chest
           sl("ruarm", 0, -36, 10, -40);
           sl("rfarm", 10, -40, 12, -48);
           sc("relbow", 10, -40);
-          // Left arm: very light swing
           sl("luarm", 0, -36, -9, -29 + c * 2);
           sl("lfarm", -9, -29 + c * 2, -7, -22);
           sc("lelbow", -9, -29 + c * 2);
@@ -239,7 +230,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
         }
       }
 
-      // ── BOOK ──────────────────────────────────────────────────────────
       const bk = $<SVGGElement>("bk");
       const bg = $<SVGGElement>("bk-glow");
       const gc = bg?.querySelector("circle");
@@ -264,7 +254,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
         bg?.setAttribute("opacity", "0");
       }
 
-      // ── LADDERS ───────────────────────────────────────────────────────
       const ll = $<SVGGElement>("lad-l");
       if (ll) {
         const op =
@@ -283,7 +272,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
         lr.setAttribute("opacity", op.toFixed(2));
       }
 
-      // ── BLINK ─────────────────────────────────────────────────────────
       blinkTimerRef.current += dt;
       if (!isBlinkRef.current && blinkTimerRef.current > 3500) {
         isBlinkRef.current = true;
@@ -305,7 +293,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
         if (bp > 120) isBlinkRef.current = false;
       }
 
-      // Mouth: small smile always, bigger when carrying book
       $<SVGPathElement>("mouth")?.setAttribute(
         "d",
         carrying ? "M-3.5,-52 Q0,-49 3.5,-52" : "M-3,-52 Q0,-50 3,-52",
@@ -326,7 +313,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
       id="hero-search"
       className="relative min-h-[560px] w-full flex flex-col items-center justify-center overflow-hidden px-6 pb-0 pt-20 font-[Poppins,sans-serif]"
     >
-      {/* Background */}
       <div
         className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: "url('/assets/catalog.jpg')" }}
@@ -343,7 +329,8 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
           className="mb-3 text-[clamp(32px,5vw,56px)] font-black leading-[1.1] tracking-tight text-[#1e2d6b] drop-shadow-sm"
           style={{ fontFamily: "Poppins, sans-serif" }}
         >
-          Literacy Freely, Legacy Fully{" "}
+          {/* 3. TERAPKAN TERJEMAHAN DI SINI */}
+          {t("heroHeadline")}
         </h1>
       </div>
 
@@ -360,18 +347,20 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search collections, journals, or authors…"
+            // 4. TERAPKAN TERJEMAHAN DI PLACEHOLDER
+            placeholder={t("heroPlaceholder")}
             className="w-full flex-1 bg-transparent text-base font-semibold text-[#1e2d6b] outline-none placeholder:font-normal placeholder:text-[#1e2d6b]/50"
           />
           <button
             type="submit"
             className="flex h-[52px] flex-shrink-0 items-center gap-2 rounded-[14px] bg-[#1e2d6b] px-7 text-[15px] font-bold text-white transition-all hover:bg-[#2d3f8e] active:scale-[0.97] shadow-md"
           >
-            Search
+            {/* 5. TERAPKAN TERJEMAHAN DI TOMBOL SEARCH */}
+            {t("search")}
           </button>
         </form>
 
-        {/* SVG overlay */}
+        {/* SVG overlay (Tetap sama, tidak ada teks) */}
         <div className="absolute top-0 left-0 w-full pointer-events-none z-20">
           <svg
             ref={svgRef}
@@ -380,7 +369,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
             className="w-full overflow-visible"
             xmlns="http://www.w3.org/2000/svg"
           >
-            {/* Left ladder — perspective leaning, near rail thicker */}
             <g id="lad-l" opacity="0">
               <line
                 x1="-50"
@@ -453,8 +441,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
               <circle cx="-50" cy="80" r="3" fill="#1e2d6b" />
               <circle cx="-34" cy="80" r="3" fill="#1e2d6b" />
             </g>
-
-            {/* Right ladder — mirrored */}
             <g id="lad-r" opacity="0">
               <line
                 x1="730"
@@ -527,8 +513,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
               <circle cx="730" cy="80" r="3" fill="#1e2d6b" />
               <circle cx="714" cy="80" r="3" fill="#1e2d6b" />
             </g>
-
-            {/* Book glow */}
             <g id="bk-glow" opacity="0">
               <circle
                 id="gc"
@@ -539,8 +523,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
                 opacity="0.15"
               />
             </g>
-
-            {/* Book — simple, clean */}
             <g id="bk" opacity="0" transform="translate(340,-20)">
               <rect
                 x="-10"
@@ -570,8 +552,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
                 opacity="0.4"
               />
             </g>
-
-            {/* Stick figure — clean, minimal */}
             <g id="fig">
               <ellipse
                 id="shd"
@@ -581,7 +561,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
                 ry="2.5"
                 fill="rgba(30,45,107,0.12)"
               />
-              {/* Legs */}
               <line
                 id="rthigh"
                 x1="2"
@@ -624,7 +603,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
                 strokeLinecap="round"
               />
               <circle id="lknee" cx="-7" cy="-9" r="2" fill="#1e2d6b" />
-              {/* Body */}
               <line
                 x1="0"
                 y1="-18"
@@ -634,7 +612,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
                 strokeWidth="3.2"
                 strokeLinecap="round"
               />
-              {/* Bag */}
               <rect
                 x="-11"
                 y="-40"
@@ -645,7 +622,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
                 stroke="#c49000"
                 strokeWidth="1"
               />
-              {/* Arms */}
               <line
                 id="ruarm"
                 x1="0"
@@ -688,7 +664,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
                 strokeLinecap="round"
               />
               <circle id="lelbow" cx="-9" cy="-29" r="1.6" fill="#1e2d6b" />
-              {/* Neck */}
               <line
                 x1="0"
                 y1="-42"
@@ -698,9 +673,7 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
                 strokeWidth="2.2"
                 strokeLinecap="round"
               />
-              {/* Head */}
               <circle cx="0" cy="-56" r="10" fill="#1e2d6b" />
-              {/* Eyes */}
               <ellipse
                 id="eyr"
                 cx="3.5"
@@ -719,7 +692,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
               />
               <circle id="pur" cx="4" cy="-56.5" r="1" fill="#1e2d6b" />
               <circle id="pul" cx="-3" cy="-56.5" r="1" fill="#1e2d6b" />
-              {/* Mouth */}
               <path
                 id="mouth"
                 d="M-3,-52 Q0,-50 3,-52"
@@ -741,7 +713,6 @@ const Hero = ({ categories = [] }: { categories?: CategoryData[] }) => {
       >
         {visibleCategories.map((cat, index) => (
           <button
-            // Key ini penting agar animasi slide-in ter-trigger tiap kali daftar bergeser
             key={`${cat.id}-${catIndex}-${index}`}
             type="button"
             onClick={() => {

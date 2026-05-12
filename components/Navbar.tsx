@@ -1,13 +1,18 @@
+// File: components/Navbar.tsx
 "use client";
 
 import React, { useState, useEffect } from "react";
 import { Search, BookOpen, Users, Tags } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const Navbar = () => {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
+
+  // Panggil fungsi t dari pusat bahasa
+  const { t } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -22,9 +27,7 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // KUNCI PERBAIKAN: Cek apakah user sedang di Beranda atau bukan
   const isHomePage = pathname === "/";
-  // Navbar jadi solid (biru) jika di-scroll ATAU jika BUKAN di halaman beranda
   const isSolid = isScrolled || !isHomePage;
 
   return (
@@ -37,9 +40,7 @@ const Navbar = () => {
             : "py-5 bg-transparent"
         }`}
       >
-        {/* Wrapper max-w-7xl agar sejajar dengan konten utama di bawahnya */}
         <div className="mx-auto w-full max-w-7xl px-5 md:px-8 flex items-center justify-between">
-          {/* Kiri: Logo Typografi JIU Press */}
           <Link
             href="/"
             className="flex items-center group active:scale-95 transition-transform"
@@ -55,26 +56,25 @@ const Navbar = () => {
             </div>
           </Link>
 
-          {/* Kanan: Link Tambahan */}
           <div className="flex items-center">
             <div className="hidden md:flex items-center gap-8 lg:gap-12 text-sm font-bold text-white/90">
               <Link
                 href="/services"
                 className="hover:text-[#FFD32B] hover:-translate-y-0.5 transition-all drop-shadow-sm"
               >
-                Layanan
+                {t("services")}
               </Link>
               <Link
                 href="/about"
                 className="hover:text-[#FFD32B] hover:-translate-y-0.5 transition-all drop-shadow-sm"
               >
-                Tentang Kami
+                {t("about")}
               </Link>
               <Link
                 href="/help"
                 className="hover:text-[#FFD32B] hover:-translate-y-0.5 transition-all drop-shadow-sm"
               >
-                Bantuan?
+                {t("help")}
               </Link>
             </div>
           </div>
@@ -98,7 +98,7 @@ const Navbar = () => {
             className="group-hover:stroke-[2.5px] transition-all"
           />
           <span className="text-[10px] font-bold uppercase tracking-wider">
-            Search
+            {t("search")}
           </span>
         </button>
 
@@ -115,7 +115,7 @@ const Navbar = () => {
             className={pathname === "/" ? "stroke-[2.5px]" : ""}
           />
           <span className="text-[10px] font-bold uppercase tracking-wider">
-            Books
+            {t("books")}
           </span>
         </Link>
 
@@ -132,7 +132,7 @@ const Navbar = () => {
             className={pathname === "/penulis" ? "stroke-[2.5px]" : ""}
           />
           <span className="text-[10px] font-bold uppercase tracking-wider">
-            Authors
+            {t("authors")}
           </span>
         </Link>
 
@@ -149,7 +149,7 @@ const Navbar = () => {
             className={pathname === "/kategori" ? "stroke-[2.5px]" : ""}
           />
           <span className="text-[10px] font-bold uppercase tracking-wider">
-            Genres
+            {t("genres")}
           </span>
         </Link>
       </nav>

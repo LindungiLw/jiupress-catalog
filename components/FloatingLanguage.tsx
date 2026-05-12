@@ -1,13 +1,11 @@
+// File: components/FloatingLanguage.tsx
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
+import { useLanguage } from "../contexts/LanguageContext";
 
 const FloatingLanguage = () => {
-  const [lang, setLang] = useState("ID");
-
-  const toggleLanguage = () => {
-    setLang(lang === "ID" ? "EN" : "ID");
-  };
+  const { language, toggleLanguage } = useLanguage();
 
   return (
     // Wrapper transparan yang membentang penuh di bawah layar
@@ -19,25 +17,25 @@ const FloatingLanguage = () => {
           onClick={toggleLanguage}
           className="pointer-events-auto relative flex h-14 w-14 items-center justify-center rounded-full bg-white backdrop-blur-md shadow-[0_10px_40px_rgba(30,45,107,0.3)] border border-slate-200 hover:bg-slate-50 hover:scale-110 active:scale-95 transition-all duration-300 group"
           title={
-            lang === "ID" ? "Switch to English" : "Ubah ke Bahasa Indonesia"
+            language === "ID" ? "Switch to English" : "Ubah ke Bahasa Indonesia"
           }
         >
           {/* Gambar Bendera Asli PNG (Dibungkus lingkaran) */}
           <div className="w-8 h-8 rounded-full overflow-hidden border border-slate-100 shadow-sm group-hover:scale-110 group-hover:rotate-6 transition-all duration-300">
             <img
               src={
-                lang === "ID"
-                  ? "https://flagcdn.com/w80/id.png" // Link PNG Bendera Indone sia
+                language === "ID"
+                  ? "https://flagcdn.com/w80/id.png" // Link PNG Bendera Indonesia
                   : "https://flagcdn.com/w80/gb.png" // Link PNG Bendera Inggris
               }
-              alt={lang === "ID" ? "Indonesian Flag" : "UK Flag"}
+              alt={language === "ID" ? "Indonesian Flag" : "UK Flag"}
               className="w-full h-full object-cover"
             />
           </div>
 
           {/* Teks ID/EN kecil di pojok sebagai penegas */}
           <span className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-[#1e2d6b] text-[10px] font-black text-white shadow-md border-2 border-white">
-            {lang}
+            {language}
           </span>
         </button>
       </div>

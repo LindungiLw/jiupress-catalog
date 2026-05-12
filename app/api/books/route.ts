@@ -11,7 +11,8 @@ export async function GET() {
     return NextResponse.json(books);
   } catch (error) {
     return NextResponse.json(
-      { error: "Gagal mengambil data buku" },
+      // 1. UBAH JADI KODE ERROR
+      { error: "FETCH_BOOKS_FAILED" },
       { status: 500 },
     );
   }
@@ -30,7 +31,7 @@ export async function POST(req: Request) {
       price,
       discountPrice,
       image,
-      shopeeLink, // <-- INI DITAMBAHKAN
+      shopeeLink,
       description,
       publishedDate,
       releaseAt,
@@ -46,7 +47,7 @@ export async function POST(req: Request) {
         price: Number(price),
         discountPrice: discountPrice ? Number(discountPrice) : null,
         image: image || null,
-        shopeeLink: shopeeLink || null, // <-- INI DITAMBAHKAN KE DATABASE
+        shopeeLink: shopeeLink || null,
         description: description || null,
         publishedDate: publishedDate ? new Date(publishedDate) : null,
         releaseAt: releaseAt ? new Date(releaseAt) : new Date(),
@@ -56,7 +57,8 @@ export async function POST(req: Request) {
     return NextResponse.json(newBook);
   } catch (error) {
     return NextResponse.json(
-      { error: "Gagal menyimpan buku" },
+      // 2. UBAH JADI KODE ERROR
+      { error: "CREATE_BOOK_FAILED" },
       { status: 500 },
     );
   }
@@ -76,7 +78,7 @@ export async function PUT(req: Request) {
       price,
       discountPrice,
       image,
-      shopeeLink, // <-- INI DITAMBAHKAN
+      shopeeLink,
       description,
       publishedDate,
       releaseAt,
@@ -84,7 +86,8 @@ export async function PUT(req: Request) {
 
     if (!id)
       return NextResponse.json(
-        { error: "ID Buku diperlukan" },
+        // 3. UBAH JADI KODE ERROR
+        { error: "MISSING_BOOK_ID" },
         { status: 400 },
       );
 
@@ -99,7 +102,7 @@ export async function PUT(req: Request) {
         price: Number(price),
         discountPrice: discountPrice ? Number(discountPrice) : null,
         image: image || null,
-        shopeeLink: shopeeLink || null, // <-- INI DITAMBAHKAN KE DATABASE
+        shopeeLink: shopeeLink || null,
         description: description || null,
         publishedDate: publishedDate ? new Date(publishedDate) : null,
         releaseAt: releaseAt ? new Date(releaseAt) : new Date(),
@@ -109,7 +112,8 @@ export async function PUT(req: Request) {
     return NextResponse.json(updatedBook);
   } catch (error) {
     return NextResponse.json(
-      { error: "Gagal mengupdate buku" },
+      // 4. UBAH JADI KODE ERROR
+      { error: "UPDATE_BOOK_FAILED" },
       { status: 500 },
     );
   }
@@ -122,15 +126,20 @@ export async function DELETE(req: Request) {
     const id = searchParams.get("id");
     if (!id)
       return NextResponse.json(
-        { error: "ID Buku tidak ditemukan" },
+        // 5. UBAH JADI KODE ERROR
+        { error: "MISSING_BOOK_ID" },
         { status: 400 },
       );
 
     await prisma.book.delete({ where: { id: Number(id) } });
-    return NextResponse.json({ message: "Buku berhasil dihapus" });
+    return NextResponse.json({
+      // 6. UBAH JADI KODE SUKSES
+      message: "DELETE_BOOK_SUCCESS",
+    });
   } catch (error) {
     return NextResponse.json(
-      { error: "Gagal menghapus buku" },
+      // 7. UBAH JADI KODE ERROR
+      { error: "DELETE_BOOK_FAILED" },
       { status: 500 },
     );
   }

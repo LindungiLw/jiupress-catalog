@@ -3,12 +3,17 @@
 import React, { useRef } from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+// 1. IMPORT PUSAT BAHASA
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface BookProps {
   books: any[];
 }
 
 const NewBooks = ({ books }: BookProps) => {
+  // 2. PANGGIL FUNGSI TERJEMAHAN
+  const { t } = useLanguage();
+
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: "left" | "right") => {
@@ -27,7 +32,8 @@ const NewBooks = ({ books }: BookProps) => {
         {/* ── Header: "New Books" di Tengah ── */}
         <div className="text-center mb-10">
           <h3 className="text-3xl md:text-4xl font-black text-[#1e2d6b] tracking-tight">
-            New Books
+            {/* 3. TERAPKAN TERJEMAHAN DI SINI */}
+            {t("newBooks")}
           </h3>
           <div className="w-12 h-1.5 bg-[#FFD32B] mx-auto mt-3 rounded-full"></div>
         </div>

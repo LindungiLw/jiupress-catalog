@@ -4,8 +4,13 @@ import React from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Info, Target, Award, ArrowRight } from "lucide-react";
+// 1. IMPORT PUSAT BAHASA
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function AboutPage() {
+  // 2. PANGGIL FUNGSI TERJEMAHAN
+  const { t } = useLanguage();
+
   return (
     <main className="min-h-screen bg-[#fcfcfc] flex flex-col font-[Poppins,sans-serif]">
       <Navbar />
@@ -20,12 +25,10 @@ export default function AboutPage() {
 
         <div className="relative z-10 max-w-4xl mx-auto mt-10">
           <h1 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tight">
-            About <span className="text-[#FFD32B]">JIU Press</span>
+            {t("aboutTitle")} <span className="text-[#FFD32B]">JIU Press</span>
           </h1>
           <p className="text-white/80 text-lg md:text-xl leading-relaxed font-medium">
-            The official publication unit of Jakarta International University,
-            dedicated to disseminating knowledge, academic works, and university
-            identity through digital literacy.
+            {t("aboutDesc")}
           </p>
         </div>
 
@@ -51,11 +54,10 @@ export default function AboutPage() {
                 <Target size={28} />
               </div>
               <h3 className="text-xl font-black text-[#1e2d6b] mb-4">
-                Our Vision
+                {t("ourVision")}
               </h3>
               <p className="text-gray-500 text-sm leading-relaxed">
-                To become an innovative and trusted university publication
-                platform on an international scale.
+                {t("visionDesc")}
               </p>
             </div>
 
@@ -65,11 +67,10 @@ export default function AboutPage() {
                 <Info size={28} />
               </div>
               <h3 className="text-xl font-black text-[#1e2d6b] mb-4">
-                Our Mission
+                {t("ourMission")}
               </h3>
               <p className="text-gray-500 text-sm leading-relaxed">
-                To facilitate lecturers and students in publishing high-quality
-                and easily accessible academic manuscripts.
+                {t("missionDesc")}
               </p>
             </div>
 
@@ -79,11 +80,10 @@ export default function AboutPage() {
                 <Award size={28} />
               </div>
               <h3 className="text-xl font-black text-[#1e2d6b] mb-4">
-                Our Quality
+                {t("ourQuality")}
               </h3>
               <p className="text-gray-500 text-sm leading-relaxed">
-                Prioritizing high standards in the editing, design, and printing
-                process of every manuscript we handle.
+                {t("qualityDesc")}
               </p>
             </div>
           </div>
@@ -96,16 +96,17 @@ export default function AboutPage() {
           <div className="absolute top-0 right-0 w-64 h-64 bg-[#FFD32B] rounded-full blur-[100px] opacity-20 pointer-events-none"></div>
 
           <h2 className="text-3xl font-black text-white mb-6 relative z-10">
-            Start Publishing With Us
+            {t("startPublishing")}
           </h2>
           <div className="flex justify-center relative z-10">
             <a
-              href="https://wa.me/6281234567890?text=Hello%20JIU%20Press%20Admin,%20I%20would%20like%20to%20inquire%20further%20about%20your%20publication%20services."
+              // JANGAN LUPA GANTI NOMOR WA DI BAWAH INI SESUAI KEBUTUHAN
+              href={`https://wa.me/6281234567890?text=${t("waMessageAbout")}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 bg-[#FFD32B] text-[#1e2d6b] px-10 py-4 rounded-xl font-bold text-lg hover:bg-white transition-all shadow-lg"
             >
-              Contact Admin <ArrowRight size={20} />
+              {t("contactAdmin")} <ArrowRight size={20} />
             </a>
           </div>
         </div>

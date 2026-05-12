@@ -2,12 +2,17 @@
 
 import React from "react";
 import { Tag } from "lucide-react";
+// 1. IMPORT PUSAT BAHASA
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface BookProps {
   books: any[];
 }
 
 const DiscountBooks = ({ books }: BookProps) => {
+  // 2. PANGGIL FUNGSI TERJEMAHAN
+  const { t } = useLanguage();
+
   // JIKA DATA KOSONG, JANGAN TAMPILKAN APAPUN (KOMPONEN HILANG)
   if (!books || books.length === 0) return null;
 
@@ -17,10 +22,13 @@ const DiscountBooks = ({ books }: BookProps) => {
         {/* Header */}
         <div className="text-center mb-10">
           <div className="flex items-center justify-center gap-2 mb-2 text-red-500 font-bold text-xs uppercase tracking-widest">
-            <Tag size={14} /> Penawaran Terbatas
+            <Tag size={14} />
+            {/* 3. TERAPKAN TERJEMAHAN DI SINI */}
+            {t("limitedOffer")}
           </div>
           <h3 className="text-3xl md:text-4xl font-black text-[#1e2d6b] tracking-tight">
-            Buku Diskon
+            {/* 4. TERAPKAN TERJEMAHAN DI SINI */}
+            {t("discountBooks")}
           </h3>
           <div className="w-12 h-1.5 bg-red-500 mx-auto mt-3 rounded-full"></div>
         </div>

@@ -2,8 +2,13 @@
 
 import React from "react";
 import { ExternalLink, MapPin, Phone, Mail } from "lucide-react";
+// 1. IMPORT PUSAT BAHASA
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const Footer = () => {
+  // 2. PANGGIL FUNGSI TERJEMAHAN
+  const { t } = useLanguage();
+
   return (
     <footer className="w-full bg-[#1e2d6b] text-white pt-20 pb-8 font-[Poppins,sans-serif] border-t-[5px] border-[#FFD32B]">
       <div className="mx-auto max-w-7xl px-[5%]">
@@ -16,7 +21,7 @@ const Footer = () => {
               <span className="font-light text-[#FFD32B]">Library</span>
             </h3>
             <p className="text-[#FFD32B] text-[0.95rem] font-semibold">
-              Digital Library JIU
+              {t("digitalLibJIU")}
             </p>
 
             {/* QR Inline Section */}
@@ -40,21 +45,20 @@ const Footer = () => {
                   iDream Library
                 </strong>
                 <span className="text-[0.7rem] text-white/60">
-                  Scan & Access Digital
+                  {t("scanAccess")}
                 </span>
               </div>
             </div>
 
             <p className="text-white/70 text-[0.9rem] leading-[1.8] mt-4">
-              Integrated digital library to support research and learning at
-              JIU.
+              {t("footerAbout")}
             </p>
           </div>
 
           {/* Kolom 2: Quick Links */}
           <div>
             <h4 className="relative text-lg font-bold mb-6 pb-2 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-10 after:h-[3px] after:bg-[#FFD32B] after:rounded-full">
-              Quick Links
+              {t("quickLinks")}
             </h4>
             <ul className="flex flex-col gap-3">
               <li>
@@ -62,7 +66,7 @@ const Footer = () => {
                   href="http://lib.jiu.ac/"
                   className="text-white/70 text-[0.95rem] hover:text-[#FFD32B] hover:translate-x-1 transition-all inline-block"
                 >
-                  (OPAC) Catalog
+                  {t("opacCatalog")}
                 </a>
               </li>
               <li>
@@ -70,7 +74,7 @@ const Footer = () => {
                   href="/faq"
                   className="text-white/70 text-[0.95rem] hover:text-[#FFD32B] hover:translate-x-1 transition-all inline-block"
                 >
-                  FAQ
+                  {t("faq")}
                 </a>
               </li>
             </ul>
@@ -79,7 +83,7 @@ const Footer = () => {
           {/* Kolom 3: External Links */}
           <div>
             <h4 className="relative text-lg font-bold mb-6 pb-2 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-10 after:h-[3px] after:bg-[#FFD32B] after:rounded-full">
-              External Links
+              {t("externalLinks")}
             </h4>
             <ul className="flex flex-col gap-3">
               <li>
@@ -88,17 +92,16 @@ const Footer = () => {
                   target="_blank"
                   className="text-white/70 text-[0.95rem] hover:text-[#FFD32B] hover:translate-x-1 transition-all inline-block"
                 >
-                  JIU Website
+                  {t("jiuWebsite")}
                 </a>
               </li>
-              {/* Tambahan Menu Baru: Library Website */}
               <li>
                 <a
                   href="https://jiulibrary.ac"
                   target="_blank"
                   className="text-white/70 text-[0.95rem] hover:text-[#FFD32B] hover:translate-x-1 transition-all inline-block"
                 >
-                  Library Website
+                  {t("libraryWebsite")}
                 </a>
               </li>
               <li>
@@ -107,7 +110,7 @@ const Footer = () => {
                   target="_blank"
                   className="text-white/70 text-[0.95rem] hover:text-[#FFD32B] hover:translate-x-1 transition-all inline-block"
                 >
-                  Digital Library
+                  {t("digitalLibrary")}
                 </a>
               </li>
             </ul>
@@ -116,7 +119,7 @@ const Footer = () => {
           {/* Kolom 4: Contact Us */}
           <div>
             <h4 className="relative text-lg font-bold mb-6 pb-2 after:content-[''] after:absolute after:left-0 after:bottom-0 after:w-10 after:h-[3px] after:bg-[#FFD32B] after:rounded-full">
-              Contact Us
+              {t("contactUs")}
             </h4>
             <ul className="flex flex-col gap-4">
               <li className="flex items-start gap-4 text-white/70 text-[0.95rem] leading-relaxed">
@@ -167,7 +170,7 @@ const Footer = () => {
         <div className="pt-6 border-t border-white/10 flex justify-center items-center text-center text-white/60 text-[0.85rem]">
           <p>
             &copy; 2026 Dream Blue Library, JIU.{" "}
-            <span>All rights reserved.</span>
+            <span>{t("allRightsReserved")}</span>
           </p>
         </div>
       </div>

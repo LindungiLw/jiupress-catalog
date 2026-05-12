@@ -2,12 +2,17 @@
 
 import React, { useState } from "react";
 import { Plus, Trash2, Tag, LayoutGrid } from "lucide-react";
+// 1. IMPORT PUSAT BAHASA
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function CategoryClient({
   initialCategories,
 }: {
   initialCategories: any[];
 }) {
+  // 2. PANGGIL FUNGSI TERJEMAHAN
+  const { t } = useLanguage();
+
   const [categories, setCategories] = useState(initialCategories);
   const [newName, setNewName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -15,23 +20,27 @@ export default function CategoryClient({
   // Fungsi Tambah Kategori ke Database
   const handleAddCategory = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newName) return alert("Isi nama kategori terlebih dahulu!");
+    // Terapkan terjemahan alert jika kosong
+    if (!newName) return alert(t("fillCategoryAlert"));
 
     setIsLoading(true);
     try {
       const res = await fetch("/api/categories", {
         method: "POST",
-        // HANYA MENGIRIM NAMA SAJA
         body: JSON.stringify({ name: newName }),
       });
 
-      if (!res.ok) throw new Error("Gagal menyimpan ke server");
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "CREATE_CATEGORY_FAILED");
+      }
 
       const data = await res.json();
       setCategories([...categories, data]);
       setNewName("");
-    } catch (err) {
-      alert("Gagal menambah kategori. Cek file API kamu.");
+    } catch (err: any) {
+      // 3. TERJEMAHKAN ERROR DARI API KE BAHASA YANG DIPILIH
+      alert(t(err.message as any) || t("failedSaveServer"));
     } finally {
       setIsLoading(false);
     }
@@ -39,27 +48,33 @@ export default function CategoryClient({
 
   // Fungsi Hapus Kategori dari Database
   const handleDelete = async (id: number) => {
-    if (!confirm("Yakin ingin menghapus kategori ini?")) return;
+    // Terapkan terjemahan alert konfirmasi
+    if (!confirm(t("confirmDeleteCategory"))) return;
 
     try {
-      await fetch(`/api/categories?id=${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/categories?id=${id}`, { method: "DELETE" });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "DELETE_CATEGORY_FAILED");
+      }
+
       setCategories(categories.filter((c) => c.id !== id));
-    } catch (err) {
-      alert("Gagal menghapus");
+    } catch (err: any) {
+      // 4. TERJEMAHKAN ERROR DARI API KE BAHASA YANG DIPILIH
+      alert(t(err.message as any) || "Gagal menghapus");
     }
   };
 
   return (
     <div className="flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      {/* HEADER & FORM - Gaya SaaS Bersih */}
+      {/* HEADER & FORM */}
       <div className="bg-white p-6 md:p-8 rounded-2xl border border-slate-200 shadow-sm">
         <div className="mb-6">
           <h3 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <Tag className="text-blue-600" size={20} /> Manajemen Kategori
+            <Tag className="text-blue-600" size={20} />{" "}
+            {t("categoryManagement")}
           </h3>
-          <p className="text-sm text-slate-500 mt-1">
-            Tambahkan atau hapus pengelompokan jenis buku di katalog.
-          </p>
+          <p className="text-sm text-slate-500 mt-1">{t("categoryDesc")}</p>
         </div>
 
         <form
@@ -69,7 +84,7 @@ export default function CategoryClient({
           <div className="flex-1">
             <input
               type="text"
-              placeholder="Nama Kategori (Contoh: Teknologi, Bisnis...)"
+              placeholder={t("categoryPlaceholder")}
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 px-4 text-sm text-slate-700 outline-none focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
@@ -81,10 +96,10 @@ export default function CategoryClient({
             className="bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500/20 active:scale-95 transition-all disabled:opacity-50 sm:w-auto w-full"
           >
             {isLoading ? (
-              "Menyimpan..."
+              t("savingBtn")
             ) : (
               <>
-                <Plus size={18} /> Tambah Kategori
+                <Plus size={18} /> {t("addCategoryBtn")}
               </>
             )}
           </button>
@@ -101,13 +116,13 @@ export default function CategoryClient({
             <div>
               <h4 className="font-bold text-slate-800 truncate">{cat.name}</h4>
               <p className="text-[11px] text-slate-400 font-medium tracking-wide mt-0.5">
-                ID KATEGORI: {cat.id}
+                {t("categoryIdLabel")}: {cat.id}
               </p>
             </div>
             <button
               onClick={() => handleDelete(cat.id)}
               className="p-2 text-slate-300 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all opacity-0 group-hover:opacity-100"
-              title="Hapus Kategori"
+              title={t("confirmDeleteCategory")}
             >
               <Trash2 size={18} />
             </button>
@@ -120,7 +135,7 @@ export default function CategoryClient({
         <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-300 flex flex-col items-center justify-center">
           <LayoutGrid size={48} className="text-slate-200 mb-4" />
           <p className="text-slate-500 font-medium text-sm">
-            Belum ada kategori yang dibuat.
+            {t("noCategoriesYet")}
           </p>
         </div>
       )}

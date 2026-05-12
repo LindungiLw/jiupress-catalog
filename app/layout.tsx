@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import "./globals.css";
-// 1. UBAH IMPORT-NYA MENJADI INI:
+
+// 1. IMPORT PROVIDER BAHASA DARI CONTEXT YANG KITA BUAT
+import { LanguageProvider } from "@/contexts/LanguageContext";
+
 import ConditionalNavbar from "../components/ConditionalNavbar";
 import FloatingLanguage from "@/components/FloatingLanguage";
 
@@ -23,13 +26,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${poppins.className} bg-[#F8FAFC] antialiased`}>
-        {/* 2. PAKAI NAVBAR PINTAR DI SINI */}
-        <ConditionalNavbar />
+        {/* 2. BUNGKUS SEMUA KOMPONEN DENGAN LANGUAGE PROVIDER */}
+        <LanguageProvider>
+          <ConditionalNavbar />
 
-        <FloatingLanguage />
+          <FloatingLanguage />
 
-        {/* Ini adalah isi halamannya (Home, dsb) yang akan berubah-ubah */}
-        {children}
+          {/* Ini adalah isi halamannya (Home, dsb) yang akan berubah-ubah */}
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

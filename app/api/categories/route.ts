@@ -10,7 +10,8 @@ export async function GET() {
     return NextResponse.json(categories);
   } catch (error) {
     return NextResponse.json(
-      { error: "Gagal mengambil kategori" },
+      // 1. UBAH JADI KODE ERROR
+      { error: "FETCH_CATEGORY_FAILED" },
       { status: 500 },
     );
   }
@@ -19,14 +20,15 @@ export async function GET() {
 // Tambah kategori baru
 export async function POST(req: Request) {
   try {
-    const { name, icon } = await req.json();
+    const { name, icon } = await req.json(); // Note: icon bisa dihapus jika di Prisma schema tidak ada
     const newCategory = await prisma.category.create({
       data: { name },
     });
     return NextResponse.json(newCategory);
   } catch (error) {
     return NextResponse.json(
-      { error: "Gagal menambah kategori" },
+      // 2. UBAH JADI KODE ERROR
+      { error: "CREATE_CATEGORY_FAILED" },
       { status: 500 },
     );
   }
@@ -39,17 +41,22 @@ export async function DELETE(req: Request) {
     const id = searchParams.get("id");
     if (!id)
       return NextResponse.json(
-        { error: "ID tidak ditemukan" },
+        // 3. UBAH JADI KODE ERROR
+        { error: "MISSING_CATEGORY_ID" },
         { status: 400 },
       );
 
     await prisma.category.delete({
       where: { id: Number(id) },
     });
-    return NextResponse.json({ message: "Kategori dihapus" });
+    return NextResponse.json({
+      // 4. UBAH JADI KODE SUKSES
+      message: "DELETE_CATEGORY_SUCCESS",
+    });
   } catch (error) {
     return NextResponse.json(
-      { error: "Gagal menghapus kategori" },
+      // 5. UBAH JADI KODE ERROR
+      { error: "DELETE_CATEGORY_FAILED" },
       { status: 500 },
     );
   }

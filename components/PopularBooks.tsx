@@ -1,13 +1,18 @@
 "use client";
 
 import React from "react";
-import Link from "next/link"; // Tambahkan Link untuk bisa di-klik ke halaman detail
+import Link from "next/link";
+// 1. IMPORT PUSAT BAHASA
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface BookProps {
   books: any[];
 }
 
 const PopularBooks = ({ books }: BookProps) => {
+  // 2. PANGGIL FUNGSI TERJEMAHAN
+  const { t } = useLanguage();
+
   // Ambil 6 buku teratas
   const topBooks = books.slice(0, 6);
 
@@ -17,7 +22,8 @@ const PopularBooks = ({ books }: BookProps) => {
         {/* ── Header: Judul di Tengah ── */}
         <div className="text-center mb-10">
           <h3 className="text-3xl md:text-4xl font-black text-[#1e2d6b] tracking-tight">
-            Popular Books
+            {/* 3. TERAPKAN TERJEMAHAN DI SINI */}
+            {t("popularBooks")}
           </h3>
           <div className="w-12 h-1.5 bg-[#FFD32B] mx-auto mt-3 rounded-full"></div>
         </div>
@@ -65,13 +71,14 @@ const PopularBooks = ({ books }: BookProps) => {
           ))}
         </div>
 
-        {/* Tombol Lihat Semua (Opsional, akan menuju halaman /catalog biasa) */}
+        {/* Tombol Lihat Semua */}
         <div className="flex justify-center">
           <Link
             href="/catalog"
             className="px-8 py-3.5 rounded-full bg-white border border-[#1e2d6b]/10 text-[#1e2d6b] font-bold text-sm transition-all hover:bg-[#1e2d6b] hover:text-white hover:border-[#1e2d6b] active:scale-95 shadow-sm hover:shadow-lg"
           >
-            Explore All Books
+            {/* 4. TERAPKAN TERJEMAHAN DI SINI */}
+            {t("exploreAllBooks")}
           </Link>
         </div>
       </div>
